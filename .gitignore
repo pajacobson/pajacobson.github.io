@@ -40,4 +40,4 @@ vignettes/*.pdf
 
 /.quarto/
 /_site/
-.DStore
+.DS_Store
