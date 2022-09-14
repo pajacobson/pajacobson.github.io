@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://pajacobson.github.io/projects.html</loc>
+    <lastmod>2022-09-14T04:51:05.674Z</lastmod>
+  </url>
+  <url>
     <loc>https://pajacobson.github.io/index.html</loc>
-    <lastmod>2022-09-13T23:32:19.444Z</lastmod>
+    <lastmod>2022-09-14T04:51:06.092Z</lastmod>
   </url>
   <url>
     <loc>https://pajacobson.github.io/about.html</loc>
-    <lastmod>2022-09-13T23:32:19.756Z</lastmod>
+    <lastmod>2022-09-14T04:51:07.821Z</lastmod>
   </url>
 </urlset>
