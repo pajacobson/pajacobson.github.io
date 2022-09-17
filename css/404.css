@@ -4,7 +4,7 @@ body{
   font-family: "montserrat", Sans-Serif;
   min-height: 100vh;
   background-color: #ffffff;
-  background-image: url("../images/404image.png");
+  background-image: url("/images/404image.png");
   background-repeat: no-repeat;
   height: 60px; /* You must set a specified height */
   background-position: top 65% right 45%; /* Position the image */
