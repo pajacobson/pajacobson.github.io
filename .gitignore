@@ -41,3 +41,4 @@ vignettes/*.pdf
 /.quarto/
 /_site/
 .DS_Store
+/TRUE/
