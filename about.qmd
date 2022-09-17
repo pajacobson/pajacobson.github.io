@@ -1,5 +1,7 @@
 ---
-title: "About"
+title: "about."
 ---
 
-About this site
+```{r}
+y <- c(1, 2, 3)
+```

@@ -3,16 +3,26 @@ project:
 
 website:
   title: "Paul Jacobson"
+
   navbar:
     left:
-      - href: index.qmd
-        text: Home
+      - text: Home
+        href: index.qmd
+      - projects.qmd
       - about.qmd
+
+    right:
+      - icon: github
+        href: https://github.com/pajacobson
+      - icon: linkedin
+        href: https://www.linkedin.com/in/paul-jacobson-15b069247/
+
 
 format:
   html:
+    minimal: true
     theme: simplex
-    css: styles.css
+    css: /css/main.css
     toc: true
 
 
