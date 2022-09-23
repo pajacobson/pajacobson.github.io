@@ -1,0 +1,195 @@
+---
+title: "Cyclistic Customer Analysis"
+subtitle: "Google Data Analytics Certificate Capstone"
+date: today
+image: images/josh-mccausland-8TfeD3J4VtQ-unsplash.jpg
+format:
+  html:
+    highlight-style: breezedark
+---
+
+## Introduction
+
+  This analysis examines the question:
+
+  > How do annual members and casual riders use Cyclistic bikes differently?
+
+```{r}
+variable_charge <- function(rate, free_min, duration) {
+  rate * (as.numeric(duration) / 60 - free_min)
+}
+```
+
+casual - single trip
+$3.30 + 30 minutes then $0.15 pm
+y = 3.3 + 0.15 * clamp(t - 30, lower = 0)
+
+casual - day pass
+$15.00 + unlimited 3hrs then $0.16
+y = 15 + 0.16 * clamp(t - 180, lower = 0)
+
+casual - electric
+$1.00 + 0.39 pm
+y = 1 + 0.39 * t
+
+member - electric
+$10 month, $0 + 0.16 pm
+y = 0.16 * t
+
+member - classic (unlimited 45 min)
+$10 month, $0 + 45min + 0.16 pm
+y = 10/n + 0.16 * clamp(t - 45, lower = 0)
+
+## Data sources
+Three primary data sources were used for the analysis:
+
+- Divvy Bikes ride data
+
+  Monthly data files from September 2021 to August 2022.
+  Additional data description and download link can be found on the [system data](https://ride.divvybikes.com/system-data) page.
+
+- Divvy Bikes website
+
+  Details of time limits and charges for current [casual and membership plans](https://ride.divvybikes.com/pricing).
+
+- Divvy Bikes active stations
+
+https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq
+
+- NOAA Daily weather records
+
+  Weather data covering September 2021 to August 2022.
+
+  O'Hare International Airport weather station was selected as representative of the Chicago region.
+
+## Data cleaning and preparation
+### Initial import
+```{r libraries}
+#| warning: false
+library(tidyverse)
+library(lubridate)
+library(glue)
+library(archive)
+```
+The Divvy trip data files have a consistent naming format prefixed with numeric year and month.
+A list of data file names is generated for months in the range `start_date` to `end_date`.
+
+```{r filename="01_import_clean.R"}
+#| label: file-list
+#| lst-cap: "Building file list"
+start_date <- "2021-09"
+end_date <- "2022-08"
+
+divvy_files <- seq(
+  ym(start_date),
+  ym(end_date),
+  by = "months"
+) %>%
+  enframe(
+    value = "timestamp"
+  ) %>%
+  glue_data(
+    "{year(timestamp)}",
+    "{stringi::stri_sprintf('%02d', month(timestamp))}",
+    "-divvy-tripdata.zip"
+  )
+```
+
+All original zip files are downloaded to the `divy_data/raw` folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.
+
+```{r}
+divvy_downloaded <- glue("divy_data/raw/{divvy_files}")
+to_dl <- divvy_files[!file.exists(divvy_downloaded)]
+```
+
+Required data files that are missing from the raw data folder are downloaded.
+
+
+
+```{r}
+#| eval: false
+
+if (length(to_dl) > 0) {
+  download.file(
+    glue("https://divvy-tripdata.s3.amazonaws.com/{to_dl}"),
+    glue("data/raw/{to_dl}")
+  )
+}
+```
+Note that the preceding section will not execute correctly in a Quarto document.
+A script for the full import process is provided in the supporting material.
+
+To check the downloaded file data, 1000 rows are read from the oldest file and column specification inspected.
+
+```{r}
+
+bike_inspect <- map_dfr(
+  divvy_downloaded[1],
+  ~ archive_read(.) %>%
+    read_csv(
+      n_max = 1000,
+      show_col_types = FALSE
+    )
+)
+spec(bike_inspect)
+```
+
+The first row from all data files is read to check for consistent naming and columns.
+
+```{r}
+
+bike_headers <- map_dfr(
+  divvy_downloaded,
+  ~ archive_read(.) %>%
+    read_csv(
+      id = "filename",
+      n_max = 1,
+      col_names = FALSE,
+      show_col_types = FALSE
+    )
+)
+knitr::kable(bike_headers)
+```
+
+After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a defined column specification. Data not matching the defined format will raise a warning from the import process.
+
+The date columns are set to import as strings as `readr::col_datetime` does not provide a way to specify timezone.
+
+```{r}
+#| cache: true
+bike_rides <- map_dfr(
+  divvy_downloaded,
+  ~ archive_read(.) %>%
+    read_csv(
+      col_types = cols(
+        ride_id = col_character(),
+        rideable_type = col_factor(levels = c(
+          "classic_bike",
+          "docked_bike",
+          "electric_bike"
+        )),
+        started_at = col_datetime(),
+        ended_at = col_datetime(),
+        start_station_name = col_character(),
+        start_station_id = col_character(),
+        end_station_name = col_character(),
+        end_station_id = col_character(),
+        start_lat = col_double(),
+        start_lng = col_double(),
+        end_lat = col_double(),
+        end_lng = col_double(),
+        member_casual = col_factor(levels = c(
+          "member",
+          "casual"
+        ))
+      ),
+      locale = locale(tz = "America/Chicago")
+    )
+)
+knitr::kable(slice_sample(bike_rides, n = 10))
+```
+
+The sample of data shows that some station names and station id's are missing.
+The missing stations do have latitude and longitude values, however on closer inspection the values appear to these have been rounded to two decimal places.
+
+This suggests that part of the data set may have been anonymised or obfuscated deliberately.
