@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://github.com/pajacobson/pajacobson.github.io/projects/cyclistic/cyclistic.html</loc>
-    <lastmod>2022-09-23T23:25:58.165Z</lastmod>
+    <loc>https://github.com/pajacobson/pajacobson.github.io/about.html</loc>
+    <lastmod>2022-09-23T23:54:08.048Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/pajacobson/pajacobson.github.io/index.html</loc>
-    <lastmod>2022-09-23T23:25:58.937Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/pajacobson/pajacobson.github.io/about.html</loc>
-    <lastmod>2022-09-23T23:25:59.293Z</lastmod>
+    <lastmod>2022-09-23T23:54:08.908Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/pajacobson/pajacobson.github.io/projects.html</loc>
-    <lastmod>2022-09-23T23:25:59.701Z</lastmod>
+    <lastmod>2022-09-23T23:54:09.420Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/pajacobson/pajacobson.github.io/projects/cyclistic/cyclistic.html</loc>
+    <lastmod>2022-09-23T23:54:10.852Z</lastmod>
   </url>
 </urlset>

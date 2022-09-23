@@ -324,29 +324,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_names =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bike_headers)</span></code></pre></div>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>filename) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bike_headers)</span></code></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 26%">
-<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 8%">
 <col style="width: 6%">
 <col style="width: 5%">
-<col style="width: 4%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 5%">
 <col style="width: 8%">
-<col style="width: 7%">
-<col style="width: 7%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 6%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">filename</th>
 <th style="text-align: left;">X1</th>
 <th style="text-align: left;">X2</th>
 <th style="text-align: left;">X3</th>
@@ -364,183 +365,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202109-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202110-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202111-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202112-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202201-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202202-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202203-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202204-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202205-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202206-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">archive_read(divy_data/raw/202207-divvy-tripdata.zip)[1]</td>
-<td style="text-align: left;">ride_id</td>
-<td style="text-align: left;">rideable_type</td>
-<td style="text-align: left;">started_at</td>
-<td style="text-align: left;">ended_at</td>
-<td style="text-align: left;">start_station_name</td>
-<td style="text-align: left;">start_station_id</td>
-<td style="text-align: left;">end_station_name</td>
-<td style="text-align: left;">end_station_id</td>
-<td style="text-align: left;">start_lat</td>
-<td style="text-align: left;">start_lng</td>
-<td style="text-align: left;">end_lat</td>
-<td style="text-align: left;">end_lng</td>
-<td style="text-align: left;">member_casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">archive_read(divy_data/raw/202208-divvy-tripdata.zip)[1]</td>
 <td style="text-align: left;">ride_id</td>
 <td style="text-align: left;">rideable_type</td>
 <td style="text-align: left;">started_at</td>
@@ -560,7 +384,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a defined column specification. Data not matching the defined format will raise a warning from the import process.</p>
-<p>The date columns are set to import as strings as <code>readr::col_datetime</code> does not provide a way to specify timezone.</p>
 <div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_79667e74751d6618be48a30904ec1d9a">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
