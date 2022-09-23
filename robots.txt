@@ -1,1 +1,1 @@
-Sitemap: https://pajacobson.github.io/sitemap.xml
+Sitemap: https://github.com/pajacobson/pajacobson.github.io/sitemap.xml

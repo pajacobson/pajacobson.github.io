@@ -2,8 +2,15 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "about.",
+    "title": "about",
     "section": "",
     "text": "y <- c(1, 2, 3)"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "projects.",
+    "section": "",
+    "text": "No matching items"
   }
 ]
