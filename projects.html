@@ -67,9 +67,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: [{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: [],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -167,7 +167,31 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-
+<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1663891200000" data-listing-file-modified-sort="1663972677340" data-listing-reading-time-sort="4.225">
+<div class="thumbnail">
+<p><a href="./projects/cyclistic/cyclistic.html"> <img src="./projects/cyclistic/images/josh-mccausland-8TfeD3J4VtQ-unsplash.jpg" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./projects/cyclistic/cyclistic.html">
+<h3 class="no-anchor listing-title">
+Cyclistic Customer Analysis
+</h3>
+<div class="listing-subtitle">
+Google Data Analytics Certificate Capstone
+</div>
+<div class="listing-description">
+This analysis examines the question:
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./projects/cyclistic/cyclistic.html">
+<div class="listing-date">
+Sep 23, 2022
+</div>
+</a>
+</div>
+</div>
 </div>
 <div class="listing-no-matching d-none">
 No matching items
