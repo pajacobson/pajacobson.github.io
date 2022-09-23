@@ -14,31 +14,6 @@ format:
 
   > How do annual members and casual riders use Cyclistic bikes differently?
 
-```{r}
-variable_charge <- function(rate, free_min, duration) {
-  rate * (as.numeric(duration) / 60 - free_min)
-}
-```
-
-casual - single trip
-$3.30 + 30 minutes then $0.15 pm
-y = 3.3 + 0.15 * clamp(t - 30, lower = 0)
-
-casual - day pass
-$15.00 + unlimited 3hrs then $0.16
-y = 15 + 0.16 * clamp(t - 180, lower = 0)
-
-casual - electric
-$1.00 + 0.39 pm
-y = 1 + 0.39 * t
-
-member - electric
-$10 month, $0 + 0.16 pm
-y = 0.16 * t
-
-member - classic (unlimited 45 min)
-$10 month, $0 + 45min + 0.16 pm
-y = 10/n + 0.16 * clamp(t - 45, lower = 0)
 
 ## Data sources
 Three primary data sources were used for the analysis:
