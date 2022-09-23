@@ -217,16 +217,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote class="blockquote">
 <p>How do annual members and casual riders use Cyclistic bikes differently?</p>
 </blockquote>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>variable_charge <span class="ot">&lt;-</span> <span class="cf">function</span>(rate, free_min, duration) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  rate <span class="sc">*</span> (<span class="fu">as.numeric</span>(duration) <span class="sc">/</span> <span class="dv">60</span> <span class="sc">-</span> free_min)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<p>casual - single trip $3.30 + 30 minutes then $0.15 pm y = 3.3 + 0.15 * clamp(t - 30, lower = 0)</p>
-<p>casual - day pass $15.00 + unlimited 3hrs then $0.16 y = 15 + 0.16 * clamp(t - 180, lower = 0)</p>
-<p>casual - electric $1.00 + 0.39 pm y = 1 + 0.39 * t</p>
-<p>member - electric $10 month, $0 + 0.16 pm y = 0.16 * t</p>
-<p>member - classic (unlimited 45 min) $10 month, $0 + 45min + 0.16 pm y = 10/n + 0.16 * clamp(t - 45, lower = 0)</p>
 </section>
 <section id="data-sources" class="level2">
 <h2 data-anchor-id="data-sources">Data sources</h2>
@@ -250,10 +240,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="initial-import" class="level3">
 <h3 data-anchor-id="initial-import">Initial import</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(archive)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(archive)</span></code></pre></div>
 </div>
 <p>The Divvy trip data files have a consistent naming format prefixed with numeric year and month. A list of data file names is generated for months in the range <code>start_date</code> to <code>end_date</code>.</p>
 <div class="cell">
@@ -261,50 +251,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="code-with-filename-file">
 <pre><strong>01_import_clean.R</strong></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>start_date <span class="ot">&lt;-</span> <span class="st">"2021-09"</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>end_date <span class="ot">&lt;-</span> <span class="st">"2022-08"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ym</span>(start_date),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ym</span>(end_date),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"months"</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enframe</span>(</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="st">"timestamp"</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue_data</span>(</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"{year(timestamp)}"</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"{stringi::stri_sprintf('%02d', month(timestamp))}"</span>,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-divvy-tripdata.zip"</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb2" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>start_date <span class="ot">&lt;-</span> <span class="st">"2021-09"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>end_date <span class="ot">&lt;-</span> <span class="st">"2022-08"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ym</span>(start_date),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ym</span>(end_date),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"months"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enframe</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="st">"timestamp"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue_data</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"{year(timestamp)}"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"{stringi::stri_sprintf('%02d', month(timestamp))}"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-divvy-tripdata.zip"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </div>
 </div>
 <p>All original zip files are downloaded to the <code>divy_data/raw</code> folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>divvy_downloaded <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"divy_data/raw/{divvy_files}"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(divvy_downloaded)]</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>divvy_downloaded <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"divy_data/raw/{divvy_files}"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(divvy_downloaded)]</span></code></pre></div>
 </div>
 <p>Required data files that are missing from the raw data folder are downloaded.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{to_dl}"</span>),</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{to_dl}"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{to_dl}"</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{to_dl}"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <p>Note that the preceding section will not execute correctly in a Quarto document. A script for the full import process is provided in the supporting material.</p>
 <p>To check the downloaded file data, 1000 rows are read from the oldest file and column specification inspected.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>bike_inspect <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded[<span class="dv">1</span>],</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_max =</span> <span class="dv">1000</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span>(bike_inspect)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bike_inspect <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded[<span class="dv">1</span>],</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_max =</span> <span class="dv">1000</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span>(bike_inspect)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>cols(
   ride_id = col_character(),
@@ -325,17 +315,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>The first row from all data files is read to check for consistent naming and columns.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_headers <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">id =</span> <span class="st">"filename"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_max =</span> <span class="dv">1</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_names =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bike_headers)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>bike_headers <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">id =</span> <span class="st">"filename"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_max =</span> <span class="dv">1</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(bike_headers)</span></code></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -571,51 +561,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a defined column specification. Data not matching the defined format will raise a warning from the import process.</p>
 <p>The date columns are set to import as strings as <code>readr::col_datetime</code> does not provide a way to specify timezone.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-7_7483c979331fdd31202c1f5af1460b52">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_types =</span> <span class="fu">cols</span>(</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">ride_id =</span> <span class="fu">col_character</span>(),</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">rideable_type =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">"classic_bike"</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">"docked_bike"</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">"electric_bike"</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        )),</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">started_at =</span> <span class="fu">col_datetime</span>(),</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">ended_at =</span> <span class="fu">col_datetime</span>(),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_station_name =</span> <span class="fu">col_character</span>(),</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_station_id =</span> <span class="fu">col_character</span>(),</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_station_name =</span> <span class="fu">col_character</span>(),</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_station_id =</span> <span class="fu">col_character</span>(),</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_lat =</span> <span class="fu">col_double</span>(),</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_lng =</span> <span class="fu">col_double</span>(),</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_lat =</span> <span class="fu">col_double</span>(),</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_lng =</span> <span class="fu">col_double</span>(),</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">member_casual =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>          <span class="st">"member"</span>,</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>          <span class="st">"casual"</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        ))</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">locale =</span> <span class="fu">locale</span>(<span class="at">tz =</span> <span class="st">"America/Chicago"</span>)</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">slice_sample</span>(bike_rides, <span class="at">n =</span> <span class="dv">10</span>))</span></code></pre></div>
+<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_79667e74751d6618be48a30904ec1d9a">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_csv</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">col_types =</span> <span class="fu">cols</span>(</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">ride_id =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">rideable_type =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">"classic_bike"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">"docked_bike"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">"electric_bike"</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        )),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">started_at =</span> <span class="fu">col_datetime</span>(),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">ended_at =</span> <span class="fu">col_datetime</span>(),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_station_name =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_station_id =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_station_name =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_station_id =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_lat =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">start_lng =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_lat =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">end_lng =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">member_casual =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>          <span class="st">"member"</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>          <span class="st">"casual"</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        ))</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">locale =</span> <span class="fu">locale</span>(<span class="at">tz =</span> <span class="st">"America/Chicago"</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">slice_sample</span>(bike_rides, <span class="at">n =</span> <span class="dv">10</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 7%">
 <col style="width: 6%">
-<col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 15%">
 <col style="width: 7%">
-<col style="width: 17%">
+<col style="width: 15%">
 <col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 4%">
-<col style="width: 4%">
+<col style="width: 3%">
 <col style="width: 4%">
 <col style="width: 6%">
 </colgroup>
@@ -638,153 +628,153 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2375ADB74CCB7C4D</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-02-12 15:59:04</td>
-<td style="text-align: left;">2022-02-12 16:01:39</td>
-<td style="text-align: left;">Damen Ave &amp; Pierce Ave</td>
-<td style="text-align: left;">TA1305000041</td>
-<td style="text-align: left;">Damen Ave &amp; Pierce Ave</td>
-<td style="text-align: left;">TA1305000041</td>
-<td style="text-align: right;">41.90940</td>
-<td style="text-align: right;">-87.67769</td>
-<td style="text-align: right;">41.90940</td>
-<td style="text-align: right;">-87.67769</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">E0605D3902A16F41</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-08-17 16:31:37</td>
-<td style="text-align: left;">2022-08-17 17:03:16</td>
-<td style="text-align: left;">Streeter Dr &amp; Grand Ave</td>
-<td style="text-align: left;">13022</td>
-<td style="text-align: left;">DuSable Lake Shore Dr &amp; Diversey Pkwy</td>
-<td style="text-align: left;">TA1309000039</td>
-<td style="text-align: right;">41.89228</td>
-<td style="text-align: right;">-87.61204</td>
-<td style="text-align: right;">41.93259</td>
-<td style="text-align: right;">-87.63643</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">762886DE9838834C</td>
+<td style="text-align: left;">DB0E5F084D47A9A8</td>
 <td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-09-16 18:48:52</td>
-<td style="text-align: left;">2021-09-16 19:03:27</td>
-<td style="text-align: left;">Clarendon Ave &amp; Junior Ter</td>
-<td style="text-align: left;">13389</td>
-<td style="text-align: left;">Clark St &amp; Bryn Mawr Ave</td>
-<td style="text-align: left;">KA1504000151</td>
-<td style="text-align: right;">41.96099</td>
-<td style="text-align: right;">-87.64949</td>
-<td style="text-align: right;">41.98353</td>
-<td style="text-align: right;">-87.66897</td>
-<td style="text-align: left;">casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">4A2AD66C38F0084C</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-10-20 10:41:13</td>
-<td style="text-align: left;">2021-10-20 12:54:17</td>
-<td style="text-align: left;">Wells St &amp; Hubbard St</td>
-<td style="text-align: left;">TA1307000151</td>
-<td style="text-align: left;">Wells St &amp; Huron St</td>
-<td style="text-align: left;">TA1306000012</td>
-<td style="text-align: right;">41.89008</td>
-<td style="text-align: right;">-87.63429</td>
-<td style="text-align: right;">41.89465</td>
-<td style="text-align: right;">-87.63435</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">AD9F8BF6098F4644</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-11-26 15:13:01</td>
-<td style="text-align: left;">2021-11-26 15:16:12</td>
-<td style="text-align: left;">Streeter Dr &amp; Grand Ave</td>
-<td style="text-align: left;">13022</td>
-<td style="text-align: left;">Streeter Dr &amp; Grand Ave</td>
-<td style="text-align: left;">13022</td>
-<td style="text-align: right;">41.89228</td>
-<td style="text-align: right;">-87.61204</td>
-<td style="text-align: right;">41.89228</td>
-<td style="text-align: right;">-87.61204</td>
-<td style="text-align: left;">casual</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3B1B7A2FFD779F55</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-01-06 19:35:47</td>
-<td style="text-align: left;">2022-01-06 20:00:12</td>
-<td style="text-align: left;">Leavitt St &amp; Armitage Ave</td>
-<td style="text-align: left;">TA1309000029</td>
-<td style="text-align: left;">Leavitt St &amp; Belmont Ave</td>
-<td style="text-align: left;">KA17018068</td>
-<td style="text-align: right;">41.91783</td>
-<td style="text-align: right;">-87.68246</td>
-<td style="text-align: right;">41.93935</td>
-<td style="text-align: right;">-87.68328</td>
-<td style="text-align: left;">casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1388163B867839B4</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-03-08 18:11:46</td>
-<td style="text-align: left;">2022-03-08 18:31:48</td>
-<td style="text-align: left;">Clark St &amp; Bryn Mawr Ave</td>
-<td style="text-align: left;">KA1504000151</td>
-<td style="text-align: left;">Wilton Ave &amp; Belmont Ave</td>
-<td style="text-align: left;">TA1307000134</td>
-<td style="text-align: right;">41.98357</td>
-<td style="text-align: right;">-87.66922</td>
-<td style="text-align: right;">41.94018</td>
-<td style="text-align: right;">-87.65304</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">7B2F2AE67D0BB49B</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-09-09 20:23:26</td>
-<td style="text-align: left;">2021-09-09 20:38:56</td>
-<td style="text-align: left;">Wells St &amp; Elm St</td>
-<td style="text-align: left;">KA1504000135</td>
-<td style="text-align: left;">New St &amp; Illinois St</td>
-<td style="text-align: left;">TA1306000013</td>
-<td style="text-align: right;">41.90322</td>
-<td style="text-align: right;">-87.63432</td>
-<td style="text-align: right;">41.89085</td>
-<td style="text-align: right;">-87.61862</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">35A5359600824CDA</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-11-17 08:10:15</td>
-<td style="text-align: left;">2021-11-17 08:16:49</td>
+<td style="text-align: left;">2022-08-19 19:48:09</td>
+<td style="text-align: left;">2022-08-19 20:03:08</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">NA</td>
-<td style="text-align: left;">Clark St &amp; Lincoln Ave</td>
-<td style="text-align: left;">13179</td>
-<td style="text-align: right;">41.93000</td>
-<td style="text-align: right;">-87.64000</td>
-<td style="text-align: right;">41.91586</td>
-<td style="text-align: right;">-87.63470</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.90000</td>
+<td style="text-align: right;">-87.66000</td>
+<td style="text-align: right;">41.91000</td>
+<td style="text-align: right;">-87.63000</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A023F0B58470C7CB</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-01 20:58:34</td>
+<td style="text-align: left;">2021-09-01 22:06:16</td>
+<td style="text-align: left;">Sheffield Ave &amp; Willow St</td>
+<td style="text-align: left;">TA1306000032</td>
+<td style="text-align: left;">Rush St &amp; Cedar St</td>
+<td style="text-align: left;">KA1504000133</td>
+<td style="text-align: right;">41.91369</td>
+<td style="text-align: right;">-87.65286</td>
+<td style="text-align: right;">41.90231</td>
+<td style="text-align: right;">-87.62769</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3CF8A34FA61D155C</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-03-14 15:58:36</td>
+<td style="text-align: left;">2022-03-14 16:09:36</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.91000</td>
+<td style="text-align: right;">-87.71000</td>
+<td style="text-align: right;">41.92000</td>
+<td style="text-align: right;">-87.69000</td>
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">30B0694376059479</td>
+<td style="text-align: left;">22EFCE15AA2D0936</td>
 <td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-06-13 14:22:54</td>
-<td style="text-align: left;">2022-06-13 14:33:53</td>
-<td style="text-align: left;">Wells St &amp; Huron St</td>
-<td style="text-align: left;">TA1306000012</td>
-<td style="text-align: left;">Clinton St &amp; Lake St</td>
-<td style="text-align: left;">13021</td>
-<td style="text-align: right;">41.89472</td>
-<td style="text-align: right;">-87.63436</td>
-<td style="text-align: right;">41.88564</td>
-<td style="text-align: right;">-87.64182</td>
+<td style="text-align: left;">2021-11-05 13:37:43</td>
+<td style="text-align: left;">2021-11-05 14:59:25</td>
+<td style="text-align: left;">Central Park Ave &amp; Elbridge Ave</td>
+<td style="text-align: left;">15644</td>
+<td style="text-align: left;">Central Park Ave &amp; Elbridge Ave</td>
+<td style="text-align: left;">15644</td>
+<td style="text-align: right;">41.93534</td>
+<td style="text-align: right;">-87.71689</td>
+<td style="text-align: right;">41.93534</td>
+<td style="text-align: right;">-87.71689</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">180D66CA199C70B5</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2021-12-19 22:00:22</td>
+<td style="text-align: left;">2021-12-19 22:02:46</td>
+<td style="text-align: left;">Broadway &amp; Sheridan Rd</td>
+<td style="text-align: left;">13323</td>
+<td style="text-align: left;">Broadway &amp; Cornelia Ave</td>
+<td style="text-align: left;">13278</td>
+<td style="text-align: right;">41.95282</td>
+<td style="text-align: right;">-87.65007</td>
+<td style="text-align: right;">41.94553</td>
+<td style="text-align: right;">-87.64644</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">E7CCC078116174C0</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-04-30 13:18:54</td>
+<td style="text-align: left;">2022-04-30 13:28:49</td>
+<td style="text-align: left;">Wentworth Ave &amp; Cermak Rd</td>
+<td style="text-align: left;">13075</td>
+<td style="text-align: left;">Shields Ave &amp; 28th Pl</td>
+<td style="text-align: left;">15443</td>
+<td style="text-align: right;">41.85309</td>
+<td style="text-align: right;">-87.63190</td>
+<td style="text-align: right;">41.84273</td>
+<td style="text-align: right;">-87.63549</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FB46C45F8A04A70C</td>
+<td style="text-align: left;">docked_bike</td>
+<td style="text-align: left;">2022-08-11 10:03:10</td>
+<td style="text-align: left;">2022-08-11 10:26:27</td>
+<td style="text-align: left;">DuSable Lake Shore Dr &amp; North Blvd</td>
+<td style="text-align: left;">LF-005</td>
+<td style="text-align: left;">DuSable Lake Shore Dr &amp; Belmont Ave</td>
+<td style="text-align: left;">TA1309000049</td>
+<td style="text-align: right;">41.91172</td>
+<td style="text-align: right;">-87.62680</td>
+<td style="text-align: right;">41.94078</td>
+<td style="text-align: right;">-87.63919</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0E05D8ED5FEAFB43</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-07-04 11:16:29</td>
+<td style="text-align: left;">2022-07-04 11:22:04</td>
+<td style="text-align: left;">Ravenswood Ave &amp; Lawrence Ave</td>
+<td style="text-align: left;">TA1309000066</td>
+<td style="text-align: left;">Damen Ave &amp; Sunnyside Ave</td>
+<td style="text-align: left;">TA1309000012</td>
+<td style="text-align: right;">41.96909</td>
+<td style="text-align: right;">-87.67424</td>
+<td style="text-align: right;">41.96325</td>
+<td style="text-align: right;">-87.67926</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2FBCF1A6CE3755EA</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-02-18 12:34:00</td>
+<td style="text-align: left;">2022-02-18 12:41:17</td>
+<td style="text-align: left;">Rush St &amp; Superior St</td>
+<td style="text-align: left;">15530</td>
+<td style="text-align: left;">Sedgwick St &amp; Schiller St</td>
+<td style="text-align: left;">TA1307000143</td>
+<td style="text-align: right;">41.89572</td>
+<td style="text-align: right;">-87.62597</td>
+<td style="text-align: right;">41.90763</td>
+<td style="text-align: right;">-87.63857</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6ED2E0056EAD585B</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-01-21 12:27:46</td>
+<td style="text-align: left;">2022-01-21 12:30:08</td>
+<td style="text-align: left;">Clinton St &amp; Jackson Blvd</td>
+<td style="text-align: left;">638</td>
+<td style="text-align: left;">Jefferson St &amp; Monroe St</td>
+<td style="text-align: left;">WL-011</td>
+<td style="text-align: right;">41.87832</td>
+<td style="text-align: right;">-87.64098</td>
+<td style="text-align: right;">41.88033</td>
+<td style="text-align: right;">-87.64275</td>
 <td style="text-align: left;">member</td>
 </tr>
 </tbody>
