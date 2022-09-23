@@ -25,5 +25,8 @@ format:
     css: /css/main.css
     toc: true
 
+execute:
+  freeze: auto
+
 
 
