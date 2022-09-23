@@ -21,7 +21,7 @@ website:
 format:
   html:
     minimal: true
-    theme: simplex
+    theme: litera
     css: /css/main.css
     toc: true
 
