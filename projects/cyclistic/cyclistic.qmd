@@ -122,13 +122,15 @@ bike_headers <- map_dfr(
       col_names = FALSE,
       show_col_types = FALSE
     )
-)
+) %>%
+  select(-filename) %>%
+  distinct()
+
 knitr::kable(bike_headers)
 ```
 
 After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a defined column specification. Data not matching the defined format will raise a warning from the import process.
 
-The date columns are set to import as strings as `readr::col_datetime` does not provide a way to specify timezone.
 
 ```{r}
 #| cache: true
