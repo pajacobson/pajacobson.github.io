@@ -6,6 +6,8 @@ image: images/josh-mccausland-8TfeD3J4VtQ-unsplash.jpg
 format:
   html:
     highlight-style: breezedark
+abstract-title: "Summary"
+abstract: "Analysis of bike share trip data to identify differences in segment behaviour."
 ---
 
 ## Introduction
@@ -13,6 +15,8 @@ format:
   This analysis examines the question:
 
   > How do annual members and casual riders use Cyclistic bikes differently?
+
+
 
 
 ## Data sources
