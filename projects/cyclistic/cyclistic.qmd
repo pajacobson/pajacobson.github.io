@@ -74,10 +74,10 @@ divvy_files <- seq(
   )
 ```
 
-All original zip files are downloaded to the `divy_data/raw` folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.
+All original zip files are downloaded to the `data/raw` folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.
 
 ```{r}
-divvy_downloaded <- glue("divy_data/raw/{divvy_files}")
+divvy_downloaded <- glue("data/raw/{divvy_files}")
 to_dl <- divvy_files[!file.exists(divvy_downloaded)]
 ```
 
