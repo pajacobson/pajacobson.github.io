@@ -275,9 +275,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </div>
 </div>
-<p>All original zip files are downloaded to the <code>divy_data/raw</code> folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.</p>
+<p>All original zip files are downloaded to the <code>data/raw</code> folder to ensure there is an unmodified copy of the data. Any files that are already present are not download again.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>divvy_downloaded <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"divy_data/raw/{divvy_files}"</span>)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>divvy_downloaded <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"data/raw/{divvy_files}"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(divvy_downloaded)]</span></code></pre></div>
 </div>
 <p>Required data files that are missing from the raw data folder are downloaded.</p>
