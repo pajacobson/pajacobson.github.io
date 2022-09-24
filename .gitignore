@@ -42,3 +42,5 @@ vignettes/*.pdf
 /_site/
 .DS_Store
 /TRUE/
+
+*.Rds
