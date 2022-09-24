@@ -25,20 +25,20 @@ Data sources
 
 Four data sources were used for the analysis:
 
-#### Divvy Bikes ride data
+### Divvy Bikes ride data
 
   Monthly data files from September 2021 to August 2022.
   Additional data description and download link can be found on the [system data](https://ride.divvybikes.com/system-data) page.
 
-#### Divvy Bikes website
+### Divvy Bikes pricing
 
-  Details of time limits and charges for current [casual and membership plans](https://ride.divvybikes.com/pricing).
+  Details of current [pricing](https://ride.divvybikes.com/pricing) for Divvy Bikes offerings.
 
-#### Divvy Bikes station status
+### Divvy Bikes station status
 
 https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq
 
-#### NOAA Daily weather records
+### NOAA Daily weather records
 
   Weather data covering September 2021 to August 2022.
 
