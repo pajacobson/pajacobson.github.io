@@ -177,7 +177,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data sources</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data sources</a>
+  <ul class="collapse">
+  <li><a href="#divvy-bikes-ride-data" id="toc-divvy-bikes-ride-data" class="nav-link" data-scroll-target="#divvy-bikes-ride-data">Divvy Bikes ride data</a></li>
+  <li><a href="#divvy-bikes-website" id="toc-divvy-bikes-website" class="nav-link" data-scroll-target="#divvy-bikes-website">Divvy Bikes website</a></li>
+  <li><a href="#divvy-bikes-station-status" id="toc-divvy-bikes-station-status" class="nav-link" data-scroll-target="#divvy-bikes-station-status">Divvy Bikes station status</a></li>
+  <li><a href="#noaa-daily-weather-records" id="toc-noaa-daily-weather-records" class="nav-link" data-scroll-target="#noaa-daily-weather-records">NOAA Daily weather records</a></li>
+  </ul></li>
   <li><a href="#data-cleaning-and-preparation" id="toc-data-cleaning-and-preparation" class="nav-link" data-scroll-target="#data-cleaning-and-preparation">Data cleaning and preparation</a>
   <ul class="collapse">
   <li><a href="#initial-import" id="toc-initial-import" class="nav-link" data-scroll-target="#initial-import">Initial import</a></li>
@@ -227,19 +233,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="data-sources" class="level2">
 <h2 data-anchor-id="data-sources">Data sources</h2>
 <p>Three primary data sources were used for the analysis:</p>
-<ul>
-<li><p>Divvy Bikes ride data</p>
-<p>Monthly data files from September 2021 to August 2022. Additional data description and download link can be found on the <a href="https://ride.divvybikes.com/system-data">system data</a> page.</p></li>
-<li><p>Divvy Bikes website</p>
-<p>Details of time limits and charges for current <a href="https://ride.divvybikes.com/pricing">casual and membership plans</a>.</p></li>
-<li><p>Divvy Bikes active stations</p></li>
-</ul>
+<section id="divvy-bikes-ride-data" class="level3">
+<h3 data-anchor-id="divvy-bikes-ride-data">Divvy Bikes ride data</h3>
+<p>Monthly data files from September 2021 to August 2022. Additional data description and download link can be found on the <a href="https://ride.divvybikes.com/system-data">system data</a> page.</p>
+</section>
+<section id="divvy-bikes-website" class="level3">
+<h3 data-anchor-id="divvy-bikes-website">Divvy Bikes website</h3>
+<p>Details of time limits and charges for current <a href="https://ride.divvybikes.com/pricing">casual and membership plans</a>.</p>
+</section>
+<section id="divvy-bikes-station-status" class="level3">
+<h3 data-anchor-id="divvy-bikes-station-status">Divvy Bikes station status</h3>
 <p>https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq</p>
-<ul>
-<li><p>NOAA Daily weather records</p>
+</section>
+<section id="noaa-daily-weather-records" class="level3">
+<h3 data-anchor-id="noaa-daily-weather-records">NOAA Daily weather records</h3>
 <p>Weather data covering September 2021 to August 2022.</p>
-<p>O’Hare International Airport weather station was selected as representative of the Chicago region.</p></li>
-</ul>
+<p>O’Hare International Airport weather station was selected as representative of the Chicago region.</p>
+</section>
 </section>
 <section id="data-cleaning-and-preparation" class="level2">
 <h2 data-anchor-id="data-cleaning-and-preparation">Data cleaning and preparation</h2>

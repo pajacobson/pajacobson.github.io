@@ -18,7 +18,7 @@
     "href": "projects/cyclistic/cyclistic.html#data-sources",
     "title": "Cyclistic Customer Analysis",
     "section": "Data sources",
-    "text": "Data sources\nThree primary data sources were used for the analysis:\n\nDivvy Bikes ride data\nMonthly data files from September 2021 to August 2022. Additional data description and download link can be found on the system data page.\nDivvy Bikes website\nDetails of time limits and charges for current casual and membership plans.\nDivvy Bikes active stations\n\nhttps://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq\n\nNOAA Daily weather records\nWeather data covering September 2021 to August 2022.\nO’Hare International Airport weather station was selected as representative of the Chicago region."
+    "text": "Data sources\nThree primary data sources were used for the analysis:\n\nDivvy Bikes ride data\nMonthly data files from September 2021 to August 2022. Additional data description and download link can be found on the system data page.\n\n\nDivvy Bikes website\nDetails of time limits and charges for current casual and membership plans.\n\n\nDivvy Bikes station status\nhttps://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq\n\n\nNOAA Daily weather records\nWeather data covering September 2021 to August 2022.\nO’Hare International Airport weather station was selected as representative of the Chicago region."
   },
   {
     "objectID": "projects/cyclistic/cyclistic.html#data-cleaning-and-preparation",
