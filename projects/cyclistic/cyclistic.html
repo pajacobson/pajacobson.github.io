@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2022-09-25">
+<meta name="dcterms.date" content="2022-09-28">
 
 <title>Paul Jacobson - Cyclistic Customer Analysis</title>
 <style>
@@ -150,25 +150,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="nav-link" href="../../about.html">About</a>
   </li>  
 </ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/pajacobson"><i class="bi bi-github" role="img">
-</i> 
- </a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/paul-jacobson-15b069247/"><i class="bi bi-linkedin" role="img">
-</i> 
- </a>
-  </li>  
-</ul>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Cyclistic Customer Analysis</h1>
+            <p class="subtitle lead">Google Data Analytics Certificate Capstone</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 28, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Summary</div>
+      An analysis of historical Divvy Bikes ride data to identify differences in user cohort behaviour.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
@@ -176,13 +192,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#examining-the-business-task" id="toc-examining-the-business-task" class="nav-link" data-scroll-target="#examining-the-business-task">Examining the business task</a></li>
   <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data sources</a>
   <ul class="collapse">
-  <li><a href="#divvy-bikes-ride-data" id="toc-divvy-bikes-ride-data" class="nav-link" data-scroll-target="#divvy-bikes-ride-data">Divvy Bikes ride data</a></li>
-  <li><a href="#divvy-bikes-pricing" id="toc-divvy-bikes-pricing" class="nav-link" data-scroll-target="#divvy-bikes-pricing">Divvy Bikes pricing</a></li>
-  <li><a href="#divvy-bikes-station-status" id="toc-divvy-bikes-station-status" class="nav-link" data-scroll-target="#divvy-bikes-station-status">Divvy Bikes station status</a></li>
-  <li><a href="#noaa-daily-weather-records" id="toc-noaa-daily-weather-records" class="nav-link" data-scroll-target="#noaa-daily-weather-records">NOAA Daily weather records</a></li>
+  <li><a href="#divvy-bikes-system-data-and-pricing" id="toc-divvy-bikes-system-data-and-pricing" class="nav-link" data-scroll-target="#divvy-bikes-system-data-and-pricing">Divvy Bikes system data and pricing</a></li>
+  <li><a href="#noaa-climate-data" id="toc-noaa-climate-data" class="nav-link" data-scroll-target="#noaa-climate-data">NOAA Climate Data</a></li>
+  <li><a href="#divvy-bikes-historical-station-status" id="toc-divvy-bikes-historical-station-status" class="nav-link" data-scroll-target="#divvy-bikes-historical-station-status">Divvy Bikes historical station status</a></li>
   </ul></li>
   <li><a href="#data-cleaning-and-preparation" id="toc-data-cleaning-and-preparation" class="nav-link" data-scroll-target="#data-cleaning-and-preparation">Data cleaning and preparation</a>
   <ul class="collapse">
@@ -192,63 +208,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Cyclistic Customer Analysis</h1>
-<p class="subtitle lead">Google Data Analytics Certificate Capstone</p>
-</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
-<div class="quarto-title-meta">
 
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">September 25, 2022</p>
-    </div>
-  </div>
-    
-  </div>
-  
-<div>
-  <div class="abstract">
-    <div class="abstract-title">Summary</div>
-    Analysis of bike share trip data to identify differences in segment behaviour.
-  </div>
-</div>
-
-</header>
-
-<section id="introduction" class="level1">
-<h1>Introduction</h1>
-<p>This analysis examines the question:</p>
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>In 2016 Cyclistic launched a bike-sharing sharing offering which has grown to a fleet of 6000 geotracked bicycles and network of more than 1000 stations across Chicago.</p>
+<p>Analysis by Cyclistic’s finance team has determined that riders who purchase annual memberships are more profitable than casual riders.</p>
+<p>Head of marketing, Lily Moreno, has set a goal of designing marketing strategies aimed at converting casual riders to members. The intial step is to better understand how casual users and members differ. This information will provide a basis for members of the marketing analytics team to investigate why casual riders might purchase a membership, and how digital media could influence marketing strategy.</p>
+</section>
+<section id="examining-the-business-task" class="level1">
+<h1>Examining the business task</h1>
+<p>The scope of this analysis is limited to the first step, and investigates the question:</p>
 <blockquote class="blockquote">
 <p>How do annual members and casual riders use Cyclistic bikes differently?</p>
 </blockquote>
+<p>Unpacking this question highlights a number of areas that may provide useful insights.</p>
+<p>What defines a member and a casual rider?</p>
+<p>The Divvy Bikes pricing information indicates members pay an upfront annual fee to access pricing that includes “no-charge” ride time and lower per minute charges. Casual riders access ride sharing on an ad-hoc basis, paying a per-ride charge, and higher per minute charge which begins when the bike is undocked. Daily pass riders pay a day access fee to access unlimited 3 hour rides for the duration of the pass.</p>
+<p>What influence do the plans have on the user behaviour? Can we distingushish plan types by the average duration of rides? What percentage of riders exceed the included 45 minutes ride time of membership plans? Is this same for members and casuals?</p>
+<p>This may help identify if time inclusions are a factor for casual riders considering membership.</p>
+<p>Another important aspect to consider is when different user cohorts ride. Which days, and times are popular for the different cohorts? And is there identifiable differences or commonality in behaviours?</p>
+<p>Are the types and number of rides influenced by day to day variations in weather or broader seasonal patterns? Are causals user all season, or fair weather riders. All season casual riders could be a group that see benefit in membership.</p>
+<p>Where do different user cohorts ride? Riders commuting to work are likely to use docking stations in business districts during the week. Recreational riders may prefer parks and areas along the shoreline or cafe precincts. Docking stations with high levels of usage on different days of the week may provide insight into where user hotspots are located.</p>
+<p>Supplementing the data provided by Divvy Bikes with weather observations will allow these questions to be investigated.</p>
 </section>
 <section id="data-sources" class="level1">
 <h1>Data sources</h1>
-<p>Four data sources were used for the analysis:</p>
-<section id="divvy-bikes-ride-data" class="level3">
-<h3 data-anchor-id="divvy-bikes-ride-data">Divvy Bikes ride data</h3>
-<p>Monthly data files from September 2021 to August 2022. Additional data description and download link can be found on the <a href="https://ride.divvybikes.com/system-data">system data</a> page.</p>
+<section id="divvy-bikes-system-data-and-pricing" class="level3">
+<h3 data-anchor-id="divvy-bikes-system-data-and-pricing">Divvy Bikes system data and pricing</h3>
+<p>The base data for individual rides was extracted from Divvy Bike data files covering the period 1 September 2021 to 31 August 2022. Additional data description and a download link is provided on the Divvy Bikes <a href="https://ride.divvybikes.com/system-data">system data</a> page.</p>
+<p>The <a href="https://ride.divvybikes.com/data-license-agreement">license</a> allows inclusion of data within analyses and studies published for non-commercial. This clause covers the intended use.</p>
+<p>Details of current <a href="https://ride.divvybikes.com/pricing">pricing</a> for Divvy Bikes offerings was accessed on 25 September 2022.</p>
 </section>
-<section id="divvy-bikes-pricing" class="level3">
-<h3 data-anchor-id="divvy-bikes-pricing">Divvy Bikes pricing</h3>
-<p>Details of current <a href="https://ride.divvybikes.com/pricing">pricing</a> for Divvy Bikes offerings.</p>
-</section>
-<section id="divvy-bikes-station-status" class="level3">
-<h3 data-anchor-id="divvy-bikes-station-status">Divvy Bikes station status</h3>
-<p>https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq</p>
-</section>
-<section id="noaa-daily-weather-records" class="level3">
-<h3 data-anchor-id="noaa-daily-weather-records">NOAA Daily weather records</h3>
-<p>Weather data covering September 2021 to August 2022.</p>
+<section id="noaa-climate-data" class="level3">
+<h3 data-anchor-id="noaa-climate-data">NOAA Climate Data</h3>
+<p>Weather data covering September 2021 to August 2022 ordered from <a href="https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094846/detail">NOOA National Centers for Environmental Information</a></p>
 <p>O’Hare International Airport weather station was selected as representative of the Chicago region.</p>
+</section>
+<section id="divvy-bikes-historical-station-status" class="level3">
+<h3 data-anchor-id="divvy-bikes-historical-station-status">Divvy Bikes historical station status</h3>
+<p>Historical station status identifies which stations actively used between September 2021 and August 2022. This information is used to assist identifying Divvy operational rides in the data set.</p>
+<p><a href="https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq">City of Chicago open data listing of Divvy Stations</a></p>
 </section>
 </section>
 <section id="data-cleaning-and-preparation" class="level1">
@@ -400,7 +403,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a defined column specification. Data not matching the defined format will raise a warning from the import process.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_79667e74751d6618be48a30904ec1d9a">
+<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_7a701c6e67cf7b6afa1d2d3f418a0f67">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
@@ -430,21 +433,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">locale =</span> <span class="fu">locale</span>(<span class="at">tz =</span> <span class="st">"America/Chicago"</span>)</span>
 <span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">slice_sample</span>(bike_rides, <span class="at">n =</span> <span class="dv">10</span>))</span></code></pre></div>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 7%">
 <col style="width: 6%">
-<col style="width: 8%">
-<col style="width: 8%">
-<col style="width: 15%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 13%">
 <col style="width: 7%">
 <col style="width: 15%">
 <col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 4%">
-<col style="width: 3%">
+<col style="width: 4%">
 <col style="width: 4%">
 <col style="width: 6%">
 </colgroup>
@@ -467,153 +473,153 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">DB0E5F084D47A9A8</td>
+<td style="text-align: left;">786A0C91C222D488</td>
 <td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-08-19 19:48:09</td>
-<td style="text-align: left;">2022-08-19 20:03:08</td>
+<td style="text-align: left;">2022-08-18 18:04:09</td>
+<td style="text-align: left;">2022-08-18 18:20:34</td>
+<td style="text-align: left;">Paulina Ave &amp; North Ave</td>
+<td style="text-align: left;">TA1305000037</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.91029</td>
+<td style="text-align: right;">-87.67010</td>
+<td style="text-align: right;">41.93000</td>
+<td style="text-align: right;">-87.70000</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">19C7482D3C77EC9F</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-07-28 19:43:48</td>
+<td style="text-align: left;">2022-07-28 19:44:00</td>
+<td style="text-align: left;">Federal St &amp; Polk St</td>
+<td style="text-align: left;">SL-008</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">NA</td>
-<td style="text-align: right;">41.90000</td>
-<td style="text-align: right;">-87.66000</td>
-<td style="text-align: right;">41.91000</td>
+<td style="text-align: right;">41.87217</td>
+<td style="text-align: right;">-87.62969</td>
+<td style="text-align: right;">41.87000</td>
 <td style="text-align: right;">-87.63000</td>
 <td style="text-align: left;">casual</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">A023F0B58470C7CB</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-09-01 20:58:34</td>
-<td style="text-align: left;">2021-09-01 22:06:16</td>
-<td style="text-align: left;">Sheffield Ave &amp; Willow St</td>
-<td style="text-align: left;">TA1306000032</td>
-<td style="text-align: left;">Rush St &amp; Cedar St</td>
-<td style="text-align: left;">KA1504000133</td>
-<td style="text-align: right;">41.91369</td>
-<td style="text-align: right;">-87.65286</td>
-<td style="text-align: right;">41.90231</td>
-<td style="text-align: right;">-87.62769</td>
-<td style="text-align: left;">member</td>
-</tr>
 <tr class="odd">
-<td style="text-align: left;">3CF8A34FA61D155C</td>
+<td style="text-align: left;">5B65E5AB9CE2254D</td>
 <td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-03-14 15:58:36</td>
-<td style="text-align: left;">2022-03-14 16:09:36</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: right;">41.91000</td>
-<td style="text-align: right;">-87.71000</td>
-<td style="text-align: right;">41.92000</td>
-<td style="text-align: right;">-87.69000</td>
-<td style="text-align: left;">member</td>
+<td style="text-align: left;">2022-08-09 19:05:53</td>
+<td style="text-align: left;">2022-08-09 19:10:58</td>
+<td style="text-align: left;">Aberdeen St &amp; Jackson Blvd</td>
+<td style="text-align: left;">13157</td>
+<td style="text-align: left;">N Green St &amp; W Lake St</td>
+<td style="text-align: left;">20246.0</td>
+<td style="text-align: right;">41.87777</td>
+<td style="text-align: right;">-87.65485</td>
+<td style="text-align: right;">41.89000</td>
+<td style="text-align: right;">-87.65000</td>
+<td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">22EFCE15AA2D0936</td>
+<td style="text-align: left;">0B4967254C941DA7</td>
 <td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-11-05 13:37:43</td>
-<td style="text-align: left;">2021-11-05 14:59:25</td>
-<td style="text-align: left;">Central Park Ave &amp; Elbridge Ave</td>
-<td style="text-align: left;">15644</td>
-<td style="text-align: left;">Central Park Ave &amp; Elbridge Ave</td>
-<td style="text-align: left;">15644</td>
-<td style="text-align: right;">41.93534</td>
-<td style="text-align: right;">-87.71689</td>
-<td style="text-align: right;">41.93534</td>
-<td style="text-align: right;">-87.71689</td>
+<td style="text-align: left;">2022-08-03 10:56:20</td>
+<td style="text-align: left;">2022-08-03 12:15:57</td>
+<td style="text-align: left;">LaSalle St &amp; Jackson Blvd</td>
+<td style="text-align: left;">TA1309000004</td>
+<td style="text-align: left;">Shedd Aquarium</td>
+<td style="text-align: left;">15544</td>
+<td style="text-align: right;">41.87817</td>
+<td style="text-align: right;">-87.63193</td>
+<td style="text-align: right;">41.86723</td>
+<td style="text-align: right;">-87.61536</td>
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">180D66CA199C70B5</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-12-19 22:00:22</td>
-<td style="text-align: left;">2021-12-19 22:02:46</td>
-<td style="text-align: left;">Broadway &amp; Sheridan Rd</td>
-<td style="text-align: left;">13323</td>
-<td style="text-align: left;">Broadway &amp; Cornelia Ave</td>
-<td style="text-align: left;">13278</td>
-<td style="text-align: right;">41.95282</td>
-<td style="text-align: right;">-87.65007</td>
-<td style="text-align: right;">41.94553</td>
-<td style="text-align: right;">-87.64644</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">E7CCC078116174C0</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-04-30 13:18:54</td>
-<td style="text-align: left;">2022-04-30 13:28:49</td>
-<td style="text-align: left;">Wentworth Ave &amp; Cermak Rd</td>
-<td style="text-align: left;">13075</td>
-<td style="text-align: left;">Shields Ave &amp; 28th Pl</td>
-<td style="text-align: left;">15443</td>
-<td style="text-align: right;">41.85309</td>
-<td style="text-align: right;">-87.63190</td>
-<td style="text-align: right;">41.84273</td>
-<td style="text-align: right;">-87.63549</td>
+<td style="text-align: left;">819EA969FCD23AEF</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-06-11 14:01:35</td>
+<td style="text-align: left;">2022-06-11 14:13:19</td>
+<td style="text-align: left;">Clark St &amp; Chicago Ave</td>
+<td style="text-align: left;">13303</td>
+<td style="text-align: left;">Daley Center Plaza</td>
+<td style="text-align: left;">TA1306000010</td>
+<td style="text-align: right;">41.89675</td>
+<td style="text-align: right;">-87.63089</td>
+<td style="text-align: right;">41.88424</td>
+<td style="text-align: right;">-87.62963</td>
 <td style="text-align: left;">casual</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">D18E554D68A1E0D9</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-08-19 14:17:06</td>
+<td style="text-align: left;">2022-08-19 14:25:22</td>
+<td style="text-align: left;">Wabash Ave &amp; 9th St</td>
+<td style="text-align: left;">TA1309000010</td>
+<td style="text-align: left;">Calumet Ave &amp; 18th St</td>
+<td style="text-align: left;">13102</td>
+<td style="text-align: right;">41.87068</td>
+<td style="text-align: right;">-87.62580</td>
+<td style="text-align: right;">41.85761</td>
+<td style="text-align: right;">-87.61941</td>
+<td style="text-align: left;">member</td>
+</tr>
 <tr class="odd">
-<td style="text-align: left;">FB46C45F8A04A70C</td>
+<td style="text-align: left;">E9CF6220FB249325</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-04-10 11:36:24</td>
+<td style="text-align: left;">2022-04-10 11:49:30</td>
+<td style="text-align: left;">Sheffield Ave &amp; Kingsbury St</td>
+<td style="text-align: left;">13154</td>
+<td style="text-align: left;">Clark St &amp; Armitage Ave</td>
+<td style="text-align: left;">13146</td>
+<td style="text-align: right;">41.91064</td>
+<td style="text-align: right;">-87.65308</td>
+<td style="text-align: right;">41.91831</td>
+<td style="text-align: right;">-87.63628</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">E0797EFDD58C6A31</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-10-06 15:59:34</td>
+<td style="text-align: left;">2021-10-06 16:33:59</td>
+<td style="text-align: left;">Halsted St &amp; 18th St (Temp)</td>
+<td style="text-align: left;">13099</td>
+<td style="text-align: left;">Halsted St &amp; Roscoe St</td>
+<td style="text-align: left;">TA1309000025</td>
+<td style="text-align: right;">41.85837</td>
+<td style="text-align: right;">-87.64639</td>
+<td style="text-align: right;">41.94367</td>
+<td style="text-align: right;">-87.64895</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9B104DD847B47367</td>
 <td style="text-align: left;">docked_bike</td>
-<td style="text-align: left;">2022-08-11 10:03:10</td>
-<td style="text-align: left;">2022-08-11 10:26:27</td>
-<td style="text-align: left;">DuSable Lake Shore Dr &amp; North Blvd</td>
-<td style="text-align: left;">LF-005</td>
-<td style="text-align: left;">DuSable Lake Shore Dr &amp; Belmont Ave</td>
-<td style="text-align: left;">TA1309000049</td>
-<td style="text-align: right;">41.91172</td>
-<td style="text-align: right;">-87.62680</td>
-<td style="text-align: right;">41.94078</td>
-<td style="text-align: right;">-87.63919</td>
+<td style="text-align: left;">2021-09-24 16:31:02</td>
+<td style="text-align: left;">2021-09-24 16:52:34</td>
+<td style="text-align: left;">Shedd Aquarium</td>
+<td style="text-align: left;">15544</td>
+<td style="text-align: left;">DuSable Lake Shore Dr &amp; Monroe St</td>
+<td style="text-align: left;">13300</td>
+<td style="text-align: right;">41.86723</td>
+<td style="text-align: right;">-87.61535</td>
+<td style="text-align: right;">41.88096</td>
+<td style="text-align: right;">-87.61674</td>
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">0E05D8ED5FEAFB43</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-07-04 11:16:29</td>
-<td style="text-align: left;">2022-07-04 11:22:04</td>
-<td style="text-align: left;">Ravenswood Ave &amp; Lawrence Ave</td>
-<td style="text-align: left;">TA1309000066</td>
-<td style="text-align: left;">Damen Ave &amp; Sunnyside Ave</td>
-<td style="text-align: left;">TA1309000012</td>
-<td style="text-align: right;">41.96909</td>
-<td style="text-align: right;">-87.67424</td>
-<td style="text-align: right;">41.96325</td>
-<td style="text-align: right;">-87.67926</td>
-<td style="text-align: left;">casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2FBCF1A6CE3755EA</td>
+<td style="text-align: left;">92703B9DB00A409A</td>
 <td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-02-18 12:34:00</td>
-<td style="text-align: left;">2022-02-18 12:41:17</td>
-<td style="text-align: left;">Rush St &amp; Superior St</td>
-<td style="text-align: left;">15530</td>
-<td style="text-align: left;">Sedgwick St &amp; Schiller St</td>
-<td style="text-align: left;">TA1307000143</td>
-<td style="text-align: right;">41.89572</td>
-<td style="text-align: right;">-87.62597</td>
-<td style="text-align: right;">41.90763</td>
-<td style="text-align: right;">-87.63857</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6ED2E0056EAD585B</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-01-21 12:27:46</td>
-<td style="text-align: left;">2022-01-21 12:30:08</td>
-<td style="text-align: left;">Clinton St &amp; Jackson Blvd</td>
-<td style="text-align: left;">638</td>
-<td style="text-align: left;">Jefferson St &amp; Monroe St</td>
-<td style="text-align: left;">WL-011</td>
-<td style="text-align: right;">41.87832</td>
-<td style="text-align: right;">-87.64098</td>
-<td style="text-align: right;">41.88033</td>
-<td style="text-align: right;">-87.64275</td>
+<td style="text-align: left;">2022-07-16 21:05:42</td>
+<td style="text-align: left;">2022-07-16 21:10:50</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Wells St &amp; Huron St</td>
+<td style="text-align: left;">TA1306000012</td>
+<td style="text-align: right;">41.91000</td>
+<td style="text-align: right;">-87.63000</td>
+<td style="text-align: right;">41.89472</td>
+<td style="text-align: right;">-87.63436</td>
 <td style="text-align: left;">member</td>
 </tr>
 </tbody>
