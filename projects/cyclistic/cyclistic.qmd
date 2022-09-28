@@ -3,49 +3,75 @@ title: "Cyclistic Customer Analysis"
 subtitle: "Google Data Analytics Certificate Capstone"
 date: today
 image: images/josh-mccausland-8TfeD3J4VtQ-unsplash.jpg
+title-block-banner: true
 format:
   html:
     highlight-style: breezedark
 abstract-title: "Summary"
-abstract: "Analysis of bike share trip data to identify differences in segment behaviour."
+abstract: "An analysis of historical Divvy Bikes ride data to identify differences in user cohort behaviour."
 ---
 
-Introduction
-============
 
-  This analysis examines the question:
+# Background
+In 2016 Cyclistic launched a bike-sharing sharing offering which has grown to a fleet of 6000 geotracked bicycles and network of more than 1000 stations across Chicago.
+
+Analysis by Cyclistic's finance team has determined that riders who purchase annual memberships are more profitable than casual riders.
+
+Head of marketing, Lily Moreno, has set a goal of designing marketing strategies aimed at converting casual riders to members. The intial step is to better understand how casual users and members differ. This information will provide a basis for members of the marketing analytics team to investigate why casual riders might purchase a membership, and how digital media could influence marketing strategy.
+
+
+
+# Examining the business task
+
+The scope of this analysis is limited to the first step, and investigates the question:
 
   > How do annual members and casual riders use Cyclistic bikes differently?
 
 
+Unpacking this question highlights a number of areas that may provide useful insights.
+
+What defines a member and a casual rider?
+
+The Divvy Bikes pricing information indicates members pay an upfront annual fee to access pricing that includes "no-charge" ride time and lower per minute charges. Casual riders access ride sharing on an ad-hoc basis, paying a per-ride charge, and higher per minute charge which begins when the bike is undocked. Daily pass riders pay a day access fee to access unlimited 3 hour rides for the duration of the pass.
+
+What influence do the plans have on the user behaviour?
+Can we distingushish plan types by the average duration of rides? What percentage of riders exceed the included 45 minutes ride time of membership plans? Is this same for members and casuals?
+
+This may help identify if time inclusions are a factor for casual riders considering membership.
+
+Another important aspect to consider is when different user cohorts ride. Which days, and times are popular for the different cohorts? And is there identifiable differences or commonality in behaviours?
+
+Are the types and number of rides influenced by day to day variations in weather or broader seasonal patterns? Are causals user all season, or fair weather riders. All season casual riders could be a group that see benefit in membership.
+
+Where do different user cohorts ride?
+Riders commuting to work are likely to use docking stations in business districts during the week. Recreational riders may prefer parks and areas along the shoreline or cafe precincts. Docking stations with high levels of usage on different days of the week may provide insight into where user hotspots are located.
+
+Supplementing the data provided by Divvy Bikes with weather observations will allow these questions to be investigated.
 
 
-Data sources
-============
+# Data sources
+### Divvy Bikes system data and pricing
+The base data for individual rides was extracted from Divvy Bike data files covering the period 1 September 2021 to 31 August 2022. Additional data description and a download link is provided on the Divvy Bikes [system data](https://ride.divvybikes.com/system-data) page.
 
-Four data sources were used for the analysis:
+The [license](https://ride.divvybikes.com/data-license-agreement) allows inclusion of data within analyses and studies published for non-commercial. This clause covers the intended use.
 
-### Divvy Bikes ride data
 
-  Monthly data files from September 2021 to August 2022.
-  Additional data description and download link can be found on the [system data](https://ride.divvybikes.com/system-data) page.
+Details of current [pricing](https://ride.divvybikes.com/pricing) for Divvy Bikes offerings was accessed on 25 September 2022.
 
-### Divvy Bikes pricing
 
-  Details of current [pricing](https://ride.divvybikes.com/pricing) for Divvy Bikes offerings.
+### NOAA Climate Data
 
-### Divvy Bikes station status
-
-https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq
-
-### NOAA Daily weather records
-
-  Weather data covering September 2021 to August 2022.
+  Weather data covering September 2021 to August 2022 ordered from [NOOA National Centers for Environmental Information](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094846/detail)
 
   O'Hare International Airport weather station was selected as representative of the Chicago region.
 
-Data cleaning and preparation
-=============================
+### Divvy Bikes historical station status
+
+Historical station status identifies which stations actively used between September 2021 and August 2022. This information is used to assist identifying Divvy operational rides in the data set.
+
+[City of Chicago open data listing of Divvy Stations](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq)
+
+# Data cleaning and preparation
 
 ### Initial import
 ```{r libraries}
@@ -172,7 +198,10 @@ bike_rides <- map_dfr(
       locale = locale(tz = "America/Chicago")
     )
 )
-knitr::kable(slice_sample(bike_rides, n = 10))
+
+bike_rides %>%
+  slice_sample(n = 10) %>%
+  knitr::kable()
 ```
 
 The sample of data shows that some station names and station id's are missing.

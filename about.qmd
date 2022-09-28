@@ -1,4 +1,14 @@
 ---
-title: "About"
+title: "Paul Jacobson"
+
+about:
+  template: trestles
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/pajacobson
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/paul-jacobson-15b069247/
 ---
 
