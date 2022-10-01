@@ -421,19 +421,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="data-inspection" class="level3">
 <h3 data-anchor-id="data-inspection">Data inspection</h3>
+<p>As an initial step, the imported data structure is checked with <code>glimpse()</code>.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">everything</span>(),</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(.x))</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">everything</span>(),</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Column"</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"Missing Count"</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 5,883,043
+Columns: 13
+$ ride_id            &lt;chr&gt; "9DC7B962304CBFD8", "F930E2C6872D6B32", "6EF7213790…
+$ rideable_type      &lt;fct&gt; electric_bike, electric_bike, electric_bike, electr…
+$ started_at         &lt;dttm&gt; 2021-09-28 16:07:10, 2021-09-28 14:24:51, 2021-09-…
+$ ended_at           &lt;dttm&gt; 2021-09-28 16:09:54, 2021-09-28 14:40:05, 2021-09-…
+$ start_station_name &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "Clark St &amp;…
+$ start_station_id   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "TA13070001…
+$ end_station_name   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ end_station_id     &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ start_lat          &lt;dbl&gt; 41.89000, 41.94000, 41.81000, 41.80000, 41.88000, 4…
+$ start_lng          &lt;dbl&gt; -87.68000, -87.64000, -87.72000, -87.72000, -87.740…
+$ end_lat            &lt;dbl&gt; 41.89, 41.98, 41.80, 41.81, 41.88, 41.88, 41.74, 41…
+$ end_lng            &lt;dbl&gt; -87.67, -87.67, -87.72, -87.72, -87.71, -87.74, -87…
+$ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual, cas…</code></pre>
+</div>
+</div>
+<p>The output indicates that the data set has 5883043 rows, and 13 columns. The start_station and end_station columns appear to have a significant number of missing –<code>NA</code>– values.</p>
+<p>The extent of the missing information can be assessed by counting the number of <code>NA</code> values in each column.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">everything</span>(),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(.x))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">everything</span>(),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Column"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"Missing Count"</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -505,20 +532,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
+<p><a href="#tbl-missing-values">Table&nbsp;1</a> indicates a significant number of records are missing end and start station name and id. End station location information is also missing small number of records. All other columns have complete data.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_start =</span> <span class="fu">is.na</span>(start_station_name),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_end =</span> <span class="fu">is.na</span>(end_station_name)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Start Only"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_start <span class="sc">&amp;</span> <span class="sc">!</span>missing_end),</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"End Only"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_end <span class="sc">&amp;</span> <span class="sc">!</span>missing_start),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Both =</span> <span class="fu">sum</span>(missing_start <span class="sc">&amp;</span> missing_end),</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Rides effected"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_start <span class="sc">|</span> missing_end)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_start =</span> <span class="fu">is.na</span>(start_station_name),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_end =</span> <span class="fu">is.na</span>(end_station_name)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Start Only"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_start <span class="sc">&amp;</span> <span class="sc">!</span>missing_end),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"End Only"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_end <span class="sc">&amp;</span> <span class="sc">!</span>missing_start),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Both =</span> <span class="fu">sum</span>(missing_start <span class="sc">&amp;</span> missing_end),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Rides effected"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_start <span class="sc">|</span> missing_end)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -550,13 +578,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_lat =</span> <span class="fu">range</span>(start_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_lng =</span> <span class="fu">range</span>(start_lng, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lat =</span> <span class="fu">range</span>(end_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lng =</span> <span class="fu">range</span>(end_lng, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_lat =</span> <span class="fu">range</span>(start_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_lng =</span> <span class="fu">range</span>(start_lng, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lat =</span> <span class="fu">range</span>(end_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lng =</span> <span class="fu">range</span>(end_lng, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -595,12 +623,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(start_station_id)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(start_lat <span class="sc">==</span> <span class="fu">round</span>(start_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(start_lng <span class="sc">==</span> <span class="fu">round</span>(start_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(start_station_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(start_lat <span class="sc">==</span> <span class="fu">round</span>(start_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(start_lng <span class="sc">==</span> <span class="fu">round</span>(start_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -635,12 +663,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(end_station_id)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(end_lat <span class="sc">==</span> <span class="fu">round</span>(end_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(end_lng <span class="sc">==</span> <span class="fu">round</span>(end_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(end_station_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(end_lat <span class="sc">==</span> <span class="fu">round</span>(end_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(end_lng <span class="sc">==</span> <span class="fu">round</span>(end_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -678,11 +706,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_range =</span> <span class="fu">range</span>(started_at),</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_range =</span> <span class="fu">range</span>(ended_at)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_range =</span> <span class="fu">range</span>(started_at),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_range =</span> <span class="fu">range</span>(ended_at)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
