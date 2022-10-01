@@ -139,6 +139,10 @@ Any files which are not present in the `data/raw`folder are downloaded.
 
 ```{r}
 #| eval: false
+# Note that the preceding section will not execute
+# correctly in a Quarto document.
+# A script for the full import process can be found in the
+# Github repository.
 
 if (length(to_dl) > 0) {
   download.file(
@@ -148,12 +152,10 @@ if (length(to_dl) > 0) {
 }
 ```
 
-Note that the preceding section will not execute correctly in a Quarto document.
-A script for the full import process can be found in the Github repository.
-
-To check the downloaded file data, the first 1000 rows are read from `r params$start_date` zip file.
+The first 1000 rows are read from `r params$start_date` zip file.
 `read_csv` uses the first 1000 rows to determine the type of data in each column.
-The guessed column type specification is inspected with the `spec` function.
+
+The "guessed" column type specification can inspected using the `spec` function.
 
 ```{r}
 bike_inspect <- map_dfr(
@@ -166,13 +168,11 @@ bike_inspect <- map_dfr(
 )
 spec(bike_inspect)
 ```
+The types defined in the column specification appear to be reasonable choices based on naming of the columns.
 
-To verify column naming is consistent across all files, the header row from each file is read.
-The resulting data frame is checked with `distinct()`.
-If all headers are identical the result is a dataframe with a single row.
+To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is processed using  `distinct()` to eliminate duplicated rows.  If all headers are identical the resulting data frame will have a single row.
 
 ```{r}
-
 bike_headers <- map_dfr(
   divvy_downloaded,
   ~ archive_read(.) %>%
@@ -355,4 +355,11 @@ As these overnight rides are excluded from the start of the data set, I've opted
 ### Data Cleaning
 
 ```{r}
+#| label: tbl-no-end-coords
+#| tbl-cap: "Missing end station coordinates"
+
+no_end_coords <- bike_rides %>%
+  filter(is.na(end_lat), is.na(end_lng))
+
+head(no_end_coords)
 ```
