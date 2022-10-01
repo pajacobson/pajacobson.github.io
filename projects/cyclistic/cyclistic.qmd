@@ -135,7 +135,7 @@ divvy_downloaded <- glue("data/raw/{divvy_files}")
 to_dl <- divvy_files[!file.exists(divvy_downloaded)]
 ```
 
-Any files which are not present in `data/raw` are downloaded.
+Any files which are not present in the `data/raw`folder are downloaded.
 
 ```{r}
 #| eval: false
@@ -225,13 +225,13 @@ bike_rides <- map_dfr(
 ```
 
 ### Data inspection
-As an initial step, the imported data structure is checked with `glimpse()`.
+With the data loaded from file, the data structure can checked with `glimpse()`.
 
 ```{r}
 bike_rides %>%
   glimpse()
 ```
-The output indicates that the data set has `r nrow(bike_rides)` rows, and `r ncol(bike_rides)` columns. The start_station and end_station columns appear to have a significant number of missing --`NA`-- values.
+The output indicates that the data set has `r nrow(bike_rides)` rows, and `r ncol(bike_rides)` columns. The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing --`NA`-- values.
 
 The extent of the missing information can be assessed by counting the number of `NA` values in each column.
 
@@ -289,7 +289,7 @@ The maximum start longitude and latitude values listed in @tbl-coord-range are s
 This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
 
 It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
-Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.
+Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre area centred on the given grid location.
 
 
 ```{r}
