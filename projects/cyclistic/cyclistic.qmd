@@ -354,6 +354,7 @@ As these overnight rides are excluded from the start of the data set, I've opted
 
 ### Data Cleaning
 
+The end stations with missing name and coordinates are addressed first.
 ```{r}
 #| label: tbl-no-end-coords
 #| tbl-cap: "Missing end station coordinates"
@@ -363,3 +364,26 @@ no_end_coords <- bike_rides %>%
 
 head(no_end_coords)
 ```
+The preview of these rides contains several rides which extend for more than a day.  Cyclistic treat bikes unlocked for more than 24 hours as stolen, so these are likely be bikes that have not been physically docked at the ride termination time.
+
+```{r}
+#| warning: false
+#| dev: "svg"
+no_end_coords %>%
+  group_by(member_casual) %>%
+  summarise(triptime = as.numeric(started_at %--% ended_at, units = "days")) %>%
+  ggplot(aes(triptime, fill = member_casual)) +
+  geom_histogram(binwidth = 1) +
+  guides(fill = "none") +
+  facet_grid(rows = vars(member_casual)) +
+  labs(
+    title = "Rides with missing end coordinate by cohort",
+    x = "Trip Duration in Days",
+    y = "Rides"
+  ) +
+  theme_bw()
+```
+
+The graph shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.
+
+
