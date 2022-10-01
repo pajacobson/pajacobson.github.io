@@ -752,6 +752,7 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </section>
 <section id="data-cleaning" class="level3">
 <h3 data-anchor-id="data-cleaning">Data Cleaning</h3>
+<p>The end stations with missing name and coordinates are addressed first.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -894,6 +895,29 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 </div>
+<p>The preview of these rides contains several rides which extend for more than a day. Cyclistic treat bikes unlocked for more than 24 hours as stolen, so these are likely be bikes that have not been physically docked at the ride termination time.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(member_casual) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">triptime =</span> <span class="fu">as.numeric</span>(started_at <span class="sc">%--%</span> ended_at, <span class="at">units =</span> <span class="st">"days"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(triptime, <span class="at">fill =</span> member_casual)) <span class="sc">+</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(member_casual)) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with missing end coordinate by cohort"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Trip Duration in Days"</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rides"</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="cyclistic_files/figure-html/unnamed-chunk-16-1.svg" width="672"></p>
+</div>
+</div>
+<p>The graph shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.</p>
 
 
 </section>
