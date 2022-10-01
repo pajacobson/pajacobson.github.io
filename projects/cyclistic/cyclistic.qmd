@@ -39,31 +39,33 @@ The scope of this analysis is limited to the first step, and investigates the qu
 
 Unpacking this question highlights a number of areas that may provide useful insights.
 
-What defines a member and a casual rider?
+#### What defines a member and a casual rider?
 
 The Divvy Bikes pricing information indicates members pay an upfront annual fee to access pricing that includes "no-charge" ride time and lower per minute charges.
 Casual riders access ride sharing on an ad-hoc basis, paying a per-ride charge, and higher per minute charge which begins when the bike is undocked.
 Daily pass riders pay a day access fee to access unlimited 3 hour rides for the duration of the pass.
 
-What influence do the plans have on the user behaviour?
+#### What influence do the plans have on the user behaviour?
 Can we distinguish plan types by the average duration of rides?
 What percentage of riders exceed the included 45 minutes ride time of membership plans?
 Is this same for members and casuals?
 
 This may help identify if time inclusions are a factor for casual riders considering membership.
 
-Another important aspect to consider is when different user cohorts ride.
+#### When do different user cohorts ride?
 Which days, and times are popular for the different cohorts?
-And is there identifiable differences or commonality in behaviours?
+And are there identifiable differences or commonality in behaviours?
 
-Are the types and number of rides influenced by day to day variations in weather or broader seasonal patterns?
-Are causals user all season, or fair weather riders.
-All season casual riders could be a group that see benefit in membership.
+#### Does weather influence rider behaviour?
+Are the types and number of rides related to day-to-day variations in weather or broader seasonal patterns?
+Are casual users "all season" or "fair weather" riders?
+Casual riders who ride around the year could be a group that would find membership attractive.
 
-Where do different user cohorts ride?
+#### Where do different user cohorts ride?
+
 Riders commuting to work are likely to use docking stations in business districts during the week.
 Recreational riders may prefer parks and areas along the shoreline or cafe precincts.
-Docking stations with high levels of usage on different days of the week may provide insight into where user hotspots are located.
+Docking stations with high levels of usage on different days of the week should provide insight into where user hotspots are located.
 
 # Data sources
 
