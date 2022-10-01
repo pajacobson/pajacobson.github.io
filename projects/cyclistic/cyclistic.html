@@ -308,16 +308,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{to_dl}"</span>),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{to_dl}"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note that the preceding section will not execute</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># correctly in a Quarto document.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># A script for the full import process can be found in the</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Github repository.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{to_dl}"</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{to_dl}"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </details>
 </div>
-<p>Note that the preceding section will not execute correctly in a Quarto document. A script for the full import process can be found in the Github repository.</p>
-<p>To check the downloaded file data, the first 1000 rows are read from September 2021 zip file. <code>read_csv</code> uses the first 1000 rows to determine the type of data in each column. The guessed column type specification is inspected with the <code>spec</code> function.</p>
+<p>The first 1000 rows are read from September 2021 zip file. <code>read_csv</code> uses the first 1000 rows to determine the type of data in each column.</p>
+<p>The “guessed” column type specification can inspected using the <code>spec</code> function.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -349,7 +354,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 )</code></pre>
 </div>
 </div>
-<p>To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is checked with <code>distinct()</code>. If all headers are identical the result is a dataframe with a single row.</p>
+<p>The types defined in the column specification appear to be reasonable choices based on naming of the columns.</p>
+<p>To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is processed using <code>distinct()</code> to eliminate duplicated rows. If all headers are identical the resulting data frame will have a single row.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -747,7 +753,146 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <section id="data-cleaning" class="level3">
 <h3 data-anchor-id="data-cleaning">Data Cleaning</h3>
 <div class="cell">
-
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(end_lat), <span class="fu">is.na</span>(end_lng))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(no_end_coords)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<div id="tbl-no-end-coords">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;7: Missing end station coordinates</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ride_id</th>
+<th style="text-align: left;">rideable_type</th>
+<th style="text-align: left;">started_at</th>
+<th style="text-align: left;">ended_at</th>
+<th style="text-align: left;">start_station_name</th>
+<th style="text-align: left;">start_station_id</th>
+<th style="text-align: left;">end_station_name</th>
+<th style="text-align: left;">end_station_id</th>
+<th style="text-align: right;">start_lat</th>
+<th style="text-align: right;">start_lng</th>
+<th style="text-align: right;">end_lat</th>
+<th style="text-align: right;">end_lng</th>
+<th style="text-align: left;">member_casual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">73445D403239209F</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-21 15:09:23</td>
+<td style="text-align: left;">2021-09-21 16:40:03</td>
+<td style="text-align: left;">Kingsbury St &amp; Kinzie St</td>
+<td style="text-align: left;">KA1503000043</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.88918</td>
+<td style="text-align: right;">-87.63851</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A2469E52D1096024</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-26 08:32:12</td>
+<td style="text-align: left;">2021-09-26 11:50:59</td>
+<td style="text-align: left;">Dearborn St &amp; Monroe St</td>
+<td style="text-align: left;">TA1305000006</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.88132</td>
+<td style="text-align: right;">-87.62952</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CEEB7DD4A1D551E6</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-04 13:52:02</td>
+<td style="text-align: left;">2021-09-04 17:21:15</td>
+<td style="text-align: left;">Michigan Ave &amp; Oak St</td>
+<td style="text-align: left;">13042</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.90096</td>
+<td style="text-align: right;">-87.62378</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">777362A22D3FAA63</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-22 10:01:36</td>
+<td style="text-align: left;">2021-09-23 11:01:27</td>
+<td style="text-align: left;">MLK Jr Dr &amp; 47th St</td>
+<td style="text-align: left;">TA1308000007</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.80985</td>
+<td style="text-align: right;">-87.61628</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2F577C3B80FCE4B7</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-10 22:48:46</td>
+<td style="text-align: left;">2021-09-11 23:48:39</td>
+<td style="text-align: left;">Shedd Aquarium</td>
+<td style="text-align: left;">15544</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.86723</td>
+<td style="text-align: right;">-87.61536</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">63BDD448BE00415C</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2021-09-15 01:53:24</td>
+<td style="text-align: left;">2021-09-16 02:53:18</td>
+<td style="text-align: left;">Ridge Blvd &amp; Touhy Ave</td>
+<td style="text-align: left;">RP-006</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">42.01213</td>
+<td style="text-align: right;">-87.68291</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">casual</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 
 
