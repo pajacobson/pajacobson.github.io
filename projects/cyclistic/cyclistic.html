@@ -760,7 +760,9 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(end_lat), <span class="fu">is.na</span>(end_lng)) <span class="sc">%&gt;%</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"start_"</span>))</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(no_end_coords)</span></code></pre></div>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="sc">%&gt;%</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ride_id) <span class="sc">%&gt;%</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -769,18 +771,16 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <caption>Table&nbsp;7: Missing end station coordinates</caption>
 <colgroup>
 <col style="width: 12%">
-<col style="width: 10%">
-<col style="width: 15%">
-<col style="width: 15%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 14%">
 <col style="width: 12%">
-<col style="width: 11%">
 <col style="width: 6%">
 <col style="width: 6%">
-<col style="width: 10%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">ride_id</th>
 <th style="text-align: left;">rideable_type</th>
 <th style="text-align: left;">started_at</th>
 <th style="text-align: left;">ended_at</th>
@@ -793,7 +793,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">73445D403239209F</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-21 15:09:23</td>
 <td style="text-align: left;">2021-09-21 16:40:03</td>
@@ -804,7 +803,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">A2469E52D1096024</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-26 08:32:12</td>
 <td style="text-align: left;">2021-09-26 11:50:59</td>
@@ -815,7 +813,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">CEEB7DD4A1D551E6</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-04 13:52:02</td>
 <td style="text-align: left;">2021-09-04 17:21:15</td>
@@ -826,7 +823,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">777362A22D3FAA63</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-22 10:01:36</td>
 <td style="text-align: left;">2021-09-23 11:01:27</td>
@@ -837,7 +833,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2F577C3B80FCE4B7</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-10 22:48:46</td>
 <td style="text-align: left;">2021-09-11 23:48:39</td>
@@ -848,7 +843,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">63BDD448BE00415C</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-09-15 01:53:24</td>
 <td style="text-align: left;">2021-09-16 02:53:18</td>
