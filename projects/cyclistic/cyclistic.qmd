@@ -360,7 +360,8 @@ The end stations with missing name and coordinates are addressed first.
 #| tbl-cap: "Missing end station coordinates"
 
 no_end_coords <- bike_rides %>%
-  filter(is.na(end_lat), is.na(end_lng))
+  filter(is.na(end_lat), is.na(end_lng)) %>%
+  select(-starts_with("start_"))
 
 head(no_end_coords)
 ```
