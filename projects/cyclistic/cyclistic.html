@@ -265,10 +265,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>The Divvy trip data files have a consistent naming format <code>YYYYMM-divvy-tripdata.zip</code>. This allows file names to be generated for months in the range September 2021 to August 2022.</p>
 <div class="cell">
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>01_import_clean.R</strong></pre>
-</div>
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(params<span class="sc">$</span>start_date),</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(params<span class="sc">$</span>end_date),</span>
@@ -282,25 +280,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"{stringi::stri_sprintf('%02d', month(timestamp))}"</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-divvy-tripdata.zip"</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-</div>
+</details>
 </div>
 <p>To preserve a local copy of the original data, zip files are downloaded to the <code>data/raw</code> folder. The folder is checked each time the script is run, and files which are already present are removed from the download list.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>divvy_downloaded <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"data/raw/{divvy_files}"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(divvy_downloaded)]</span></code></pre></div>
+</details>
 </div>
 <p>Any files which are not present in <code>data/raw</code> are downloaded.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{to_dl}"</span>),</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{to_dl}"</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
 </div>
 <p>Note that the preceding section will not execute correctly in a Quarto document. A script for the full import process can be found in the Github repository.</p>
 <p>To check the downloaded file data, the first 1000 rows are read from September 2021 zip file. <code>read_csv</code> uses the first 1000 rows to determine the type of data in each column. The guessed column type specification is inspected with the <code>spec</code> function.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>bike_inspect <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded[<span class="dv">1</span>],</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
@@ -310,6 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span>(bike_inspect)</span></code></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>cols(
   ride_id = col_character(),
@@ -330,6 +337,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is checked with <code>distinct()</code>. If all headers are identical the result is a dataframe with a single row.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>bike_headers <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
@@ -342,6 +351,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(bike_headers)</span></code></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>tibble [1 × 13] (S3: tbl_df/tbl/data.frame)
  $ X1 : chr "ride_id"
@@ -361,6 +371,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>After verifying the detected formats, and checking column naming is consistent across all files, the full dataset can be imported. Passing the full column specification to <code>read_csv()</code> ensure that data which does not match the expected type is flagged as a problem. Issues that arise while importing data can be examined using the <code>problems()</code> function.</p>
 <div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_7ebde1549cd4a8c9008f65ee103ce821">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  divvy_downloaded,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">archive_read</span>(.) <span class="sc">%&gt;%</span></span>
@@ -390,11 +402,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">locale =</span> <span class="fu">locale</span>(<span class="at">tz =</span> <span class="st">"America/Chicago"</span>)</span>
 <span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</details>
 </div>
 </section>
 <section id="data-inspection" class="level3">
 <h3 data-anchor-id="data-inspection">Data inspection</h3>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">everything</span>(),</span>
@@ -405,9 +420,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Column"</span>,</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"Missing Count"</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
-<div id="tbl-both-missing">
+<div id="tbl-missing-values">
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;1: Missing Values</caption>
 <thead>
@@ -475,7 +491,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<div class="cell tbl-cap-location-bottom">
+<div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_start =</span> <span class="fu">is.na</span>(start_station_name),</span>
@@ -487,6 +505,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Both =</span> <span class="fu">sum</span>(missing_start <span class="sc">&amp;</span> missing_end),</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Rides effected"</span> <span class="ot">=</span> <span class="fu">sum</span>(missing_start <span class="sc">|</span> missing_end)</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
 <div id="tbl-missing-by-station">
@@ -513,8 +532,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for least one docking stations. This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.</p>
+<p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for at least one docking station. This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_lat =</span> <span class="fu">range</span>(start_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
@@ -522,6 +543,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lat =</span> <span class="fu">range</span>(end_lat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_lng =</span> <span class="fu">range</span>(end_lng, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
 <div id="tbl-coord-range">
@@ -555,7 +577,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>The maximum start longitude and latitude values listed in <a href="#tbl-coord-range">Table&nbsp;3</a> are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.</p>
+<p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(start_station_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(start_lat <span class="sc">==</span> <span class="fu">round</span>(start_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(start_lng <span class="sc">==</span> <span class="fu">round</span>(start_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
 <div id="tbl-clipped-start">
@@ -585,7 +617,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
+<p>Comparing <a href="#tbl-missing-values">Table&nbsp;1</a> with <a href="#tbl-clipped-start">Table&nbsp;4</a> indicates the count of start stations with missing names is the same as those which have rounded coordinates.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Missing =</span> <span class="fu">is.na</span>(end_station_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Latitude =</span> <span class="fu">sum</span>(end_lat <span class="sc">==</span> <span class="fu">round</span>(end_lat, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Longitude =</span> <span class="fu">sum</span>(end_lng <span class="sc">==</span> <span class="fu">round</span>(end_lng, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
 <div id="tbl-clipped-end">
@@ -615,17 +657,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.</p>
-<p>Notably all start stations with missing names also have rounded coordinates. The total of ends stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.</p>
-<p>This suggests that there is a systemic reason for the missing data, rather than error. The data may have been anonymised to protect riders privacy. This needs to be checked with Cyclistics data collection team.</p>
-<p>The ride duration and other information appears plausible and the lack of location data does not impact ride count, or duration. These records can be retained but filtered for any analysis which depends on accurate location.</p>
-<p>While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named.</p>
+<p>Comparing <a href="#tbl-missing-values">Table&nbsp;1</a> with <a href="#tbl-clipped-end">Table&nbsp;5</a> indicates the combined count of end stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.</p>
+<p>This suggests that there is a systemic reason for the missing data, rather than error. It seems likely the location data has been anonymised to protect riders privacy. This needs to be verified with Cyclistics data collection team.</p>
+<p>The ride duration and other information appear plausible and the lack of location data does not impact analysis of this data. Records with missing location information will be retained but filtered for any analysis which depends on accurate location.</p>
+<p>While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named. These need to be checked during cleaning.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_range =</span> <span class="fu">range</span>(started_at),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_range =</span> <span class="fu">range</span>(ended_at)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_range =</span> <span class="fu">range</span>(started_at),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_range =</span> <span class="fu">range</span>(ended_at)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
 <div class="cell-output-display">
 <div class="kable-table">
 <div id="tbl-date-ranges">
@@ -660,6 +704,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="data-cleaning" class="level3">
 <h3 data-anchor-id="data-cleaning">Data Cleaning</h3>
+<div class="cell">
+
+</div>
 
 
 </section>
