@@ -7,77 +7,92 @@ title-block-banner: true
 format:
   html:
     highlight-style: breezedark
-
+    df-print: kable
 abstract-title: "Summary"
 abstract: "An analysis of historical Divvy Bikes ride data to identify differences in user cohort behaviour."
 params:
   start_date: "September 2021"
   end_date: "August 2022"
+editor:
+  markdown:
+    wrap: sentence
 ---
 
-
 # Background
+
 In 2016 Cyclistic launched a bike-sharing sharing offering which has grown to a fleet of 6000 geotracked bicycles and network of more than 1000 stations across Chicago.
 
 Analysis by Cyclistic's finance team has determined that riders who purchase annual memberships are more profitable than casual riders.
 
-Head of marketing, Lily Moreno, has set a goal of designing marketing strategies aimed at converting casual riders to members. The intial step is to better understand how casual users and members differ. This information will provide a basis for members of the marketing analytics team to investigate why casual riders might purchase a membership, and how digital media could influence marketing strategy.
+Head of marketing, Lily Moreno, has set a goal of designing marketing strategies aimed at converting casual riders to members.
+The intial step is to better understand how casual users and members differ.
+This information will provide a basis for members of the marketing analytics team to investigate why casual riders might purchase a membership, and how digital media could influence marketing strategy.
 
 The executive team, which is detail oriented, will decide whether the proposed marketing strategies are approved.
-
 
 # Defining the business task
 
 The scope of this analysis is limited to the first step, and investigates the question:
 
-  > How do annual members and casual riders use Cyclistic bikes differently?
-
+> How do annual members and casual riders use Cyclistic bikes differently?
 
 Unpacking this question highlights a number of areas that may provide useful insights.
 
 What defines a member and a casual rider?
 
-The Divvy Bikes pricing information indicates members pay an upfront annual fee to access pricing that includes "no-charge" ride time and lower per minute charges. Casual riders access ride sharing on an ad-hoc basis, paying a per-ride charge, and higher per minute charge which begins when the bike is undocked. Daily pass riders pay a day access fee to access unlimited 3 hour rides for the duration of the pass.
+The Divvy Bikes pricing information indicates members pay an upfront annual fee to access pricing that includes "no-charge" ride time and lower per minute charges.
+Casual riders access ride sharing on an ad-hoc basis, paying a per-ride charge, and higher per minute charge which begins when the bike is undocked.
+Daily pass riders pay a day access fee to access unlimited 3 hour rides for the duration of the pass.
 
 What influence do the plans have on the user behaviour?
-Can we distinguish plan types by the average duration of rides? What percentage of riders exceed the included 45 minutes ride time of membership plans? Is this same for members and casuals?
+Can we distinguish plan types by the average duration of rides?
+What percentage of riders exceed the included 45 minutes ride time of membership plans?
+Is this same for members and casuals?
 
 This may help identify if time inclusions are a factor for casual riders considering membership.
 
-Another important aspect to consider is when different user cohorts ride. Which days, and times are popular for the different cohorts? And is there identifiable differences or commonality in behaviours?
+Another important aspect to consider is when different user cohorts ride.
+Which days, and times are popular for the different cohorts?
+And is there identifiable differences or commonality in behaviours?
 
-Are the types and number of rides influenced by day to day variations in weather or broader seasonal patterns? Are causals user all season, or fair weather riders. All season casual riders could be a group that see benefit in membership.
+Are the types and number of rides influenced by day to day variations in weather or broader seasonal patterns?
+Are causals user all season, or fair weather riders.
+All season casual riders could be a group that see benefit in membership.
 
 Where do different user cohorts ride?
-Riders commuting to work are likely to use docking stations in business districts during the week. Recreational riders may prefer parks and areas along the shoreline or cafe precincts. Docking stations with high levels of usage on different days of the week may provide insight into where user hotspots are located.
-
-
+Riders commuting to work are likely to use docking stations in business districts during the week.
+Recreational riders may prefer parks and areas along the shoreline or cafe precincts.
+Docking stations with high levels of usage on different days of the week may provide insight into where user hotspots are located.
 
 # Data sources
+
 ### Divvy Bikes system data and pricing
-The base data for individual rides was extracted from Divvy Bike data files covering the period 1 September 2021 to 31 August 2022. Additional data description and a download link is provided on the Divvy Bikes [system data](https://ride.divvybikes.com/system-data) page.
 
-The [license](https://ride.divvybikes.com/data-license-agreement) allows inclusion of data within analyses and studies published for non-commercial. This clause covers the intended use.
+The base data for individual rides was extracted from Divvy Bike data files covering the period 1 September 2021 to 31 August 2022.
+Additional data description and a download link is provided on the Divvy Bikes [system data](https://ride.divvybikes.com/system-data) page.
 
+The [license](https://ride.divvybikes.com/data-license-agreement) allows inclusion of data within analyses and studies published for non-commercial.
+This clause covers the intended use.
 
 Details of current [pricing](https://ride.divvybikes.com/pricing) for Divvy Bikes offerings was accessed on 25 September 2022.
 
-
 ### NOAA Climate Data
 
-  Weather data covering September 2021 to August 2022 ordered from [NOOA National Centers for Environmental Information](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094846/detail)
+Weather data covering September 2021 to August 2022 ordered from [NOOA National Centers for Environmental Information](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094846/detail)
 
-  O'Hare International Airport weather station was selected as representative of the Chicago region.
+O'Hare International Airport weather station was selected as representative of the Chicago region.
 
 ### Divvy Bikes historical station status
 
-Historical station status identifies which stations actively used between September 2021 and August 2022. This information is used to assist identifying Divvy operational rides in the data set.
+Historical station status identifies which stations actively used between September 2021 and August 2022.
+This information is used to assist identifying Divvy operational rides in the data set.
 
 [City of Chicago open data listing of Divvy Stations](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq)
 
 # Data cleaning and preparation
 
 ### Initial import
+
 ```{r libraries}
 #| warning: false
 #| echo: false
@@ -86,8 +101,9 @@ library(lubridate)
 library(glue)
 library(archive)
 ```
-The Divvy trip data files have a consistent naming format prefixed with numeric year and month.
-A list of data file names is generated for months in the range `r params$start_date` to `r params$end_date`.
+
+The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
+This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
 
 ```{r filename="01_import_clean.R"}
 #| label: file-list
@@ -109,17 +125,15 @@ divvy_files <- seq(
   )
 ```
 
-All original zip files are downloaded to the `data/raw` folder and are not modified.
-Any files that are already present are skipped.
+To preserve a local copy of the original data, zip files are downloaded to the `data/raw` folder.
+The folder is checked each time the script is run, and files which are already present are removed from the download list.
 
 ```{r}
 divvy_downloaded <- glue("data/raw/{divvy_files}")
 to_dl <- divvy_files[!file.exists(divvy_downloaded)]
 ```
 
-Required data files that are missing from the raw data folder are downloaded.
-
-
+Any files which are not present in `data/raw` are downloaded.
 
 ```{r}
 #| eval: false
@@ -131,14 +145,15 @@ if (length(to_dl) > 0) {
   )
 }
 ```
+
 Note that the preceding section will not execute correctly in a Quarto document.
-A script for the full import process is provided in the supporting material.
+A script for the full import process can be found in the Github repository.
 
-
-To check the downloaded file data, the first 1000 rows are read from `r params$start_date` zip file and column specification inspected.
+To check the downloaded file data, the first 1000 rows are read from `r params$start_date` zip file.
+`read_csv` uses the first 1000 rows to determine the type of data in each column.
+The guessed column type specification is inspected with the `spec` function.
 
 ```{r}
-
 bike_inspect <- map_dfr(
   divvy_downloaded[1],
   ~ archive_read(.) %>%
@@ -150,8 +165,9 @@ bike_inspect <- map_dfr(
 spec(bike_inspect)
 ```
 
-To verify the column naming is consistent across all files, the header row from all data files is read.
-
+To verify column naming is consistent across all files, the header row from each file is read.
+The resulting data frame is checked with `distinct()`.
+If all headers are identical the result is a dataframe with a single row.
 
 ```{r}
 
@@ -159,22 +175,19 @@ bike_headers <- map_dfr(
   divvy_downloaded,
   ~ archive_read(.) %>%
     read_csv(
-      id = "filename",
       n_max = 1,
       col_names = FALSE,
       show_col_types = FALSE
     )
 ) %>%
-  select(-filename) %>%
   distinct()
 
 str(bike_headers)
 ```
 
-After checking the detected formats, and ensuring the column naming is consistent across all files, data is read from the zip files using a fixed column specification.
-
-Data which does not matching the defined column specification will raise a warning from the import process.
-
+After verifying the detected formats, and checking column naming is consistent across all files, the full dataset can be imported.
+Passing the full column specification to `read_csv()` ensure that data which does not match the expected type is flagged as a problem.
+Issues that arise while importing data can be examined using the `problems()` function.
 
 ```{r}
 #| cache: true
@@ -208,12 +221,13 @@ bike_rides <- map_dfr(
     )
 )
 ```
+
 ### Data inspection
 
 ```{r}
 #| label: tbl-both-missing
 #| tbl-cap: "Missing Values"
-#| tbl-cap-location: bottom
+
 bike_rides %>%
   summarise(across(
     everything(),
@@ -223,10 +237,8 @@ bike_rides %>%
     cols = everything(),
     names_to = "Column",
     values_to = "Missing Count"
-  ) %>%
-  knitr::kable()
+  )
 ```
-
 
 ```{r}
 #| label: tbl-missing-by-station
@@ -242,11 +254,11 @@ bike_rides %>%
     "End Only" = sum(missing_end & !missing_start),
     Both = sum(missing_start & missing_end),
     "Rides effected" = sum(missing_start | missing_end)
-  ) %>%
-  knitr::kable()
+  )
 ```
 
-@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for least one docking stations. This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.
+@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for least one docking stations.
+This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.
 
 ```{r}
 #| label: tbl-coord-range
@@ -257,10 +269,46 @@ bike_rides %>%
     start_lng = range(start_lng, na.rm = TRUE),
     end_lat = range(end_lat, na.rm = TRUE),
     end_lng = range(end_lng, na.rm = TRUE)
-  ) %>%
-  knitr::kable()
+  )
 ```
-The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic. This should be investigated.
+
+The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values.
+This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
+
+
+
+```{r}
+#| label: tbl-clipped-start
+#| tbl-cap: "Clipped coordinates and missing start station name"
+#| echo: false
+bike_rides %>%
+  group_by(Missing = is.na(start_station_id)) %>%
+  summarise(
+    Latitude = sum(start_lat == round(start_lat, 2), na.rm = TRUE),
+    Longitude = sum(start_lng == round(start_lng, 2), na.rm = TRUE)
+  )
+```
+```{r}
+#| label: tbl-clipped-end
+#| tbl-cap: "Clipped coordinates and missing end station name"
+#| echo: false
+bike_rides %>%
+  group_by(Missing = is.na(end_station_id)) %>%
+  summarise(
+    Latitude = sum(end_lat == round(end_lat, 2), na.rm = TRUE),
+    Longitude = sum(end_lng == round(end_lng, 2), na.rm = TRUE)
+  )
+```
+It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
+Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.
+
+Notably all start stations with missing names also have rounded coordinates. The total of ends stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.
+
+This suggests that there is a systemic reason for the missing data, rather than error. The data may have been anonymised to protect riders privacy. This needs to be checked with Cyclistics data collection team.
+
+The ride duration and other information appears plausible and the lack of location data does not impact ride count, or duration. These records can be retained but filtered for any analysis which depends on accurate location.
+
+While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named.
 
 ```{r}
 #| label: tbl-date-ranges
@@ -269,18 +317,26 @@ bike_rides %>%
   summarise(
     start_range = range(started_at),
     end_range = range(ended_at)
-  ) %>%
-  knitr::kable()
+  )
 ```
 
 @tbl-date-ranges indicates the dataset includes rides which finished after `r params$end_date`.
+
 ```{r}
-bike_rides %>%
-  filter(ended_at > ymd_hms("20220901 07:00:00")) %>%
-  summarise(n())
+#| echo: false
+eop_rides_00 <- bike_rides %>%
+  filter(ended_at > ymd_hms("20220901 00:00:00")) %>%
+  summarise(n = n()) %>%
+  pull(n)
+
+eop_rides_12 <- bike_rides %>%
+  filter(ended_at > ymd_hms("20220901 09:00:00")) %>%
+  summarise(n = n()) %>%
+  pull(n)
 ```
 
-The sample of data shows that some station names and station id's are missing.
-The missing stations do have latitude and longitude values, however on closer inspection the values appear to these have been rounded to two decimal places.
+In total `r eop_rides_00` rides are active at midnight on 31 August 2022.
+Of these, `r eop_rides_12` rides are still active at 9.00am on 1 September 2022.
+As these overnight rides are excluded from the start of the data set, I've opted to retain rides which completed prior to 9.00am to ensure this group of riders is not under represented.
 
-This suggests that part of the data set may have been anonymised or obfuscated deliberately.
+### Data Cleaning
