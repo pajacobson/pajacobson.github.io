@@ -363,7 +363,9 @@ no_end_coords <- bike_rides %>%
   filter(is.na(end_lat), is.na(end_lng)) %>%
   select(-starts_with("start_"))
 
-head(no_end_coords)
+no_end_coords %>%
+  select(-ride_id) %>%
+  head()
 ```
 The preview of these rides contains several rides which extend for more than a day.  Cyclistic treat bikes unlocked for more than 24 hours as stolen, so these are likely be bikes that have not been physically docked at the ride termination time.
 
