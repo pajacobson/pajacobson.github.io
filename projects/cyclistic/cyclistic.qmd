@@ -8,6 +8,7 @@ format:
   html:
     highlight-style: breezedark
     df-print: kable
+    code-fold: true
 abstract-title: "Summary"
 abstract: "An analysis of historical Divvy Bikes ride data to identify differences in user cohort behaviour."
 params:
@@ -105,10 +106,9 @@ library(archive)
 The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
 This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
 
-```{r filename="01_import_clean.R"}
+```{r}
 #| label: file-list
 #| lst-cap: "Building file list"
-
 
 divvy_files <- seq(
   my(params$start_date),
@@ -225,7 +225,7 @@ bike_rides <- map_dfr(
 ### Data inspection
 
 ```{r}
-#| label: tbl-both-missing
+#| label: tbl-missing-values
 #| tbl-cap: "Missing Values"
 
 bike_rides %>%
@@ -243,7 +243,6 @@ bike_rides %>%
 ```{r}
 #| label: tbl-missing-by-station
 #| tbl-cap: "Missing Values by station type"
-#| tbl-cap-location: bottom
 bike_rides %>%
   mutate(
     missing_start = is.na(start_station_name),
@@ -257,7 +256,7 @@ bike_rides %>%
   )
 ```
 
-@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for least one docking stations.
+@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station.
 This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.
 
 ```{r}
@@ -275,12 +274,13 @@ bike_rides %>%
 The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values.
 This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
 
+It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
+Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.
 
 
 ```{r}
 #| label: tbl-clipped-start
 #| tbl-cap: "Clipped coordinates and missing start station name"
-#| echo: false
 bike_rides %>%
   group_by(Missing = is.na(start_station_id)) %>%
   summarise(
@@ -288,10 +288,11 @@ bike_rides %>%
     Longitude = sum(start_lng == round(start_lng, 2), na.rm = TRUE)
   )
 ```
+Comparing @tbl-missing-values with @tbl-clipped-start indicates the count of start stations with missing names is the same as those which have rounded coordinates.
+
 ```{r}
 #| label: tbl-clipped-end
 #| tbl-cap: "Clipped coordinates and missing end station name"
-#| echo: false
 bike_rides %>%
   group_by(Missing = is.na(end_station_id)) %>%
   summarise(
@@ -299,16 +300,14 @@ bike_rides %>%
     Longitude = sum(end_lng == round(end_lng, 2), na.rm = TRUE)
   )
 ```
-It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
-Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.
 
-Notably all start stations with missing names also have rounded coordinates. The total of ends stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.
+Comparing @tbl-missing-values with @tbl-clipped-end indicates the combined count of end stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.
 
-This suggests that there is a systemic reason for the missing data, rather than error. The data may have been anonymised to protect riders privacy. This needs to be checked with Cyclistics data collection team.
+This suggests that there is a systemic reason for the missing data, rather than error. It seems likely the location data has been anonymised to protect riders privacy. This needs to be verified with Cyclistics data collection team.
 
-The ride duration and other information appears plausible and the lack of location data does not impact ride count, or duration. These records can be retained but filtered for any analysis which depends on accurate location.
+The ride duration and other information appear plausible and the lack of location data does not impact analysis of this data. Records with missing location information will be retained but filtered for any analysis which depends on accurate location.
 
-While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named.
+While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named. These need to be checked during cleaning.
 
 ```{r}
 #| label: tbl-date-ranges
@@ -340,3 +339,6 @@ Of these, `r eop_rides_12` rides are still active at 9.00am on 1 September 2022.
 As these overnight rides are excluded from the start of the data set, I've opted to retain rides which completed prior to 9.00am to ensure this group of riders is not under represented.
 
 ### Data Cleaning
+
+```{r}
+```
