@@ -225,6 +225,15 @@ bike_rides <- map_dfr(
 ```
 
 ### Data inspection
+As an initial step, the imported data structure is checked with `glimpse()`.
+
+```{r}
+bike_rides %>%
+  glimpse()
+```
+The output indicates that the data set has `r nrow(bike_rides)` rows, and `r ncol(bike_rides)` columns. The start_station and end_station columns appear to have a significant number of missing --`NA`-- values.
+
+The extent of the missing information can be assessed by counting the number of `NA` values in each column.
 
 ```{r}
 #| label: tbl-missing-values
@@ -241,6 +250,9 @@ bike_rides %>%
     values_to = "Missing Count"
   )
 ```
+@tbl-missing-values indicates a significant number of records are missing end and start station name and id.  End station location information is also missing small number of records.
+All other columns have complete data.
+
 
 ```{r}
 #| label: tbl-missing-by-station
