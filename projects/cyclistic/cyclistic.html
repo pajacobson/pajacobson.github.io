@@ -304,7 +304,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(divvy_downloaded)]</span></code></pre></div>
 </details>
 </div>
-<p>Any files which are not present in <code>data/raw</code> are downloaded.</p>
+<p>Any files which are not present in the <code>data/raw</code>folder are downloaded.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -421,7 +421,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="data-inspection" class="level3">
 <h3 data-anchor-id="data-inspection">Data inspection</h3>
-<p>As an initial step, the imported data structure is checked with <code>glimpse()</code>.</p>
+<p>With the data loaded from file, the data structure can checked with <code>glimpse()</code>.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -446,7 +446,7 @@ $ end_lng            &lt;dbl&gt; -87.67, -87.67, -87.72, -87.72, -87.71, -87.74,
 $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual, cas…</code></pre>
 </div>
 </div>
-<p>The output indicates that the data set has 5883043 rows, and 13 columns. The start_station and end_station columns appear to have a significant number of missing –<code>NA</code>– values.</p>
+<p>The output indicates that the data set has 5883043 rows, and 13 columns. The <code>start_station_name</code>, <code>start_stattion_id</code>, <code>end_station_name</code> and <code>end_station_id</code> columns appear to have a number of missing –<code>NA</code>– values.</p>
 <p>The extent of the missing information can be assessed by counting the number of <code>NA</code> values in each column.</p>
 <div class="cell">
 <details>
@@ -619,7 +619,7 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 <p>The maximum start longitude and latitude values listed in <a href="#tbl-coord-range">Table&nbsp;3</a> are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.</p>
-<p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre centred on the given grid location.</p>
+<p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre area centred on the given grid location.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
