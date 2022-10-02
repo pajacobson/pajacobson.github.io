@@ -908,10 +908,10 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
 <colgroup>
-<col style="width: 25%">
-<col style="width: 50%">
-<col style="width: 11%">
-<col style="width: 12%">
+<col style="width: 21%">
+<col style="width: 57%">
+<col style="width: 9%">
+<col style="width: 10%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -923,40 +923,40 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Tuley (Murray) Park</td>
-<td style="text-align: right;">41.73034</td>
-<td style="text-align: right;">-87.61173</td>
+<td style="text-align: left;">2022-05-17 20:35:40</td>
+<td style="text-align: left;">East End Ave &amp; 87th St</td>
+<td style="text-align: right;">41.73705</td>
+<td style="text-align: right;">-87.58400</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Brandon Ave &amp; 91st St</td>
-<td style="text-align: right;">41.73022</td>
-<td style="text-align: right;">-87.54676</td>
+<td style="text-align: left;">2022-08-29 19:15:57</td>
+<td style="text-align: left;">Public Rack - May St &amp; 87th St</td>
+<td style="text-align: right;">41.73556</td>
+<td style="text-align: right;">-87.65170</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2021-10-08 20:25:05</td>
-<td style="text-align: left;">Kedzie Ave &amp; 57th St</td>
-<td style="text-align: right;">41.78994</td>
-<td style="text-align: right;">-87.70323</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Carpenter St &amp; 63rd St</td>
-<td style="text-align: right;">41.77987</td>
-<td style="text-align: right;">-87.65092</td>
+<td style="text-align: left;">Spaulding Ave &amp; Division St</td>
+<td style="text-align: right;">41.90271</td>
+<td style="text-align: right;">-87.70922</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - S Kostner Ave &amp; W 18th Pl</td>
-<td style="text-align: right;">41.85519</td>
-<td style="text-align: right;">-87.73456</td>
+<td style="text-align: left;">Public Rack - Menard Ave &amp; Grand Ave</td>
+<td style="text-align: right;">41.91979</td>
+<td style="text-align: right;">-87.77098</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Loomis St &amp; Lexington St</td>
+<td style="text-align: right;">41.87219</td>
+<td style="text-align: right;">-87.66150</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Michigan Ave &amp; Lake St</td>
-<td style="text-align: right;">41.88602</td>
-<td style="text-align: right;">-87.62412</td>
+<td style="text-align: left;">2022-07-07 14:15:27</td>
+<td style="text-align: left;">Public Rack - Spencer Elementary Technology Academy</td>
+<td style="text-align: right;">41.88466</td>
+<td style="text-align: right;">-87.75050</td>
 </tr>
 </tbody>
 </table>
@@ -1273,7 +1273,8 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">6</span>)</span></code></pre></div>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ride_id) <span class="sc">%&gt;%</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">6</span>)</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -1282,26 +1283,24 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <caption>Table&nbsp;11: Sample of rides with duration</caption>
 <colgroup>
 <col style="width: 5%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 16%">
 <col style="width: 7%">
-<col style="width: 1%">
-<col style="width: 1%">
+<col style="width: 7%">
+<col style="width: 17%">
 <col style="width: 8%">
-<col style="width: 5%">
+<col style="width: 1%">
+<col style="width: 1%">
 <col style="width: 9%">
+<col style="width: 6%">
+<col style="width: 10%">
 <col style="width: 5%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 3%">
-<col style="width: 4%">
+<col style="width: 5%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">ride_id</th>
 <th style="text-align: left;">rideable_type</th>
 <th style="text-align: left;">started_at</th>
 <th style="text-align: left;">ended_at</th>
@@ -1322,7 +1321,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">968ABB06677BD5CD</td>
 <td style="text-align: left;">electric_bike</td>
 <td style="text-align: left;">2022-06-19 13:53:59</td>
 <td style="text-align: left;">2022-06-19 14:20:50</td>
@@ -1341,7 +1339,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">72E70E68A18EE5B8</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-10-13 19:44:31</td>
 <td style="text-align: left;">2021-10-13 19:48:36</td>
@@ -1360,7 +1357,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">CC2E229CCBD029A1</td>
 <td style="text-align: left;">electric_bike</td>
 <td style="text-align: left;">2022-03-24 16:37:16</td>
 <td style="text-align: left;">2022-03-24 16:46:33</td>
@@ -1379,7 +1375,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">4EF164091A973257</td>
 <td style="text-align: left;">electric_bike</td>
 <td style="text-align: left;">2022-07-18 17:51:31</td>
 <td style="text-align: left;">2022-07-18 18:03:14</td>
@@ -1398,7 +1393,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">4B48ACA032CCE9B3</td>
 <td style="text-align: left;">classic_bike</td>
 <td style="text-align: left;">2021-11-21 15:24:47</td>
 <td style="text-align: left;">2021-11-21 15:32:30</td>
@@ -1417,7 +1411,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">664B181B2BAA2A9C</td>
 <td style="text-align: left;">electric_bike</td>
 <td style="text-align: left;">2021-11-11 07:33:57</td>
 <td style="text-align: left;">2021-11-11 07:45:09</td>
@@ -1483,20 +1476,22 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">month =</span> <span class="fu">floor_date</span>(<span class="fu">as.Date</span>(started_at), <span class="st">"month"</span>)</span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrt =</span> <span class="fu">mean</span>(ride_time <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrt =</span> <span class="fu">mean</span>(ride_time <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">*</span> <span class="dv">100</span></span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(month, nrt)) <span class="sc">+</span></span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with negative duration"</span>,</span>
 <span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion of Rides"</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage of Rides"</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="cyclistic_files/figure-html/unnamed-chunk-22-1.svg" width="672"></p>
 </div>
 </div>
+<p>The plot indicates that November has far higher percentage of rides with negative durations than other months. This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.</p>
+<p>Ride start and end timestamps do not provide timezone data. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.</p>
 
 
 </section>
