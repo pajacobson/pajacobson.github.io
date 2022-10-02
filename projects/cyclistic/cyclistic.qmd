@@ -354,6 +354,7 @@ As these overnight rides are excluded from the start of the data set, I've opted
 
 ### Data Cleaning
 
+#### Missing end station coordinates
 The end stations with missing name and coordinates are addressed first.
 ```{r}
 #| label: tbl-no-end-coords
@@ -369,11 +370,12 @@ no_end_coords %>%
   ) %>%
   head()
 ```
-The preview of these rides contains several rides which extend for more than a day.  Cyclistic treat bikes unlocked for more than 24 hours as stolen, so these are likely be bikes that have not been physically docked at the ride termination time.
+The preview of these rides contains several rides which extend for more than a day.  Cyclistic treat bikes unlocked for more than 24 hours as stolen. These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.
 
 ```{r}
 #| warning: false
 #| dev: "svg"
+
 no_end_coords %>%
   group_by(member_casual) %>%
   summarise(triptime = as.numeric(started_at %--% ended_at, units = "days")) %>%
@@ -389,6 +391,65 @@ no_end_coords %>%
   theme_bw()
 ```
 
-The graph shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.
+The plot shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.
+
+#### Cyclistic operational rides
+A list of stations that were *In-Service* between `r params$start_date` and `r params$end_date` was extracted from a dataset maintained by City of Chicago. The dataset for the period of interest contains over 35 million rows recording the status of each docking station at hour intervals.
+
+Due to the size of the dataset the processed listing of stations is used in this analysis.
+
+```{r}
+#| label: tbl-stations-in-use
+#| tbl-cap: "Stations recorded as in-service"
+#| warning: false
+active_stations <- read_csv(
+  "data/processed/stations_in_use.csv",
+  show_col_types = FALSE
+)
+
+active_stations %>%
+  slice_sample(n = 6) %>%
+  select(-id)
+```
+
+A random sample of stations from the dataset is shown in @tbl-stations-in-use. The timestamp indicates the first time a station appears as *In-Service* in the original dataset.
 
 
+The active stations dataset is used to identify stations that were not listed as publicly available.
+
+```{r}
+#| label: tbl-unlisted-stations
+#| tbl-cap: "Unlisted stations"
+#| warning: false
+unlisted_start <- bike_rides %>%
+  anti_join(
+    active_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  select(
+    station_name = start_station_name,
+    station_id = start_station_id
+  )
+
+unlisted_end <- bike_rides %>%
+  anti_join(
+    active_stations,
+    by = c("end_station_name" = "station_name")
+  ) %>%
+  select(
+    station_name = end_station_name,
+    station_id = end_station_id
+  )
+
+unlisted_stations <- unlisted_start %>%
+  bind_rows(unlisted_end) %>%
+  drop_na(station_name, station_id) %>%
+  group_by(station_name, station_id) %>%
+  summarise(count = n())
+
+unlisted_stations
+```
+
+@tbl-unlisted-stations summarises the stations that appear in `bike_rides` without a corresponding match in the `active_stations` dataset.
+
+The majority of stations in the table appear to have an operational function. Those ending with "- Charging" appear to be associated with testing of new charging stations prior to the company publicly announcing their availability.
