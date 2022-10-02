@@ -450,6 +450,82 @@ unlisted_stations <- unlisted_start %>%
 unlisted_stations
 ```
 
-@tbl-unlisted-stations summarises the stations that appear in `bike_rides` without a corresponding match in the `active_stations` dataset.
+@tbl-unlisted-stations summarises stations which appear in `bike_rides` without a corresponding match in the `active_stations` dataset.
 
 The majority of stations in the table appear to have an operational function. Those ending with "- Charging" appear to be associated with testing of new charging stations prior to the company publicly announcing their availability.
+
+#### Removing identified problems
+Before proceeding with further manipulation and cleaning, the observations with identified problems should be removed.
+This is done using `dplyr::anti_join()` to filter the `bike_rides` dataset removing items matching those found in the `unlisted_stations` and `no_end_coords` data.frames.
+
+```{r}
+#| label: tbl-remove-operational
+#| tbl-cap: "Sample of cleaned data"
+#| cache: true
+
+bike_rides <- bike_rides %>%
+  anti_join(
+    unlisted_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  anti_join(
+    unlisted_stations,
+    by = c("end_station_name" = "station_name")
+  ) %>%
+  anti_join(
+    no_end_coords,
+    by = "ride_id"
+  )
+
+bike_rides %>%
+  slice_sample(n = 6)
+```
+@tbl-remove-operational shows a sample of the dataset after initial cleaning.
+
+#### Ride duration
+
+```{r}
+#| label: tbl-add-duration
+#| tbl-cap: "Sample of rides with duration"
+
+bike_rides <- bike_rides %>%
+  mutate(
+    ride_int = started_at %--% ended_at,
+    ride_time = as.duration(ride_int),
+    hour = hour(started_at),
+    day = wday(started_at, label = TRUE),
+    .before = start_station_name
+  )
+
+bike_rides %>%
+  slice_sample(n = 6)
+```
+```{r}
+#| label: tbl-ride-min-max
+#| tbl-cap: "Summary of ride duration (hours)"
+
+bike_rides %>%
+  summarise(
+    Minimum = min(ride_time) / 3600,
+    Maximum = max(ride_time) / 3600,
+    "Rides with negative time" = sum(ride_time < 0)
+  )
+```
+
+```{r}
+#| dev: "svg"
+bike_rides %>%
+  group_by(
+    month = floor_date(as.Date(started_at), "month")
+  ) %>%
+  summarise(
+    nrt = mean(ride_time <= 0) * 100
+  ) %>%
+  ggplot(aes(month, nrt)) +
+  geom_col() +
+  labs(
+    title = "Rides with negative duration",
+    x = "Month",
+    y = "Proportion of Rides"
+  )
+```
