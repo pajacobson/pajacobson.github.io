@@ -498,6 +498,7 @@ bike_rides <- bike_rides %>%
   )
 
 bike_rides %>%
+  select(-ride_id) %>%
   slice_sample(n = 6)
 ```
 ```{r}
@@ -519,13 +520,18 @@ bike_rides %>%
     month = floor_date(as.Date(started_at), "month")
   ) %>%
   summarise(
-    nrt = mean(ride_time <= 0) * 100
+    nrt = mean(ride_time < 0) * 100
   ) %>%
   ggplot(aes(month, nrt)) +
   geom_col() +
   labs(
     title = "Rides with negative duration",
     x = "Month",
-    y = "Proportion of Rides"
+    y = "Percentage of Rides"
   )
 ```
+The plot indicates that November has far higher percentage of rides with negative durations than other months.
+This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.
+
+Ride start and end timestamps do not provide timezone data. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.
+
