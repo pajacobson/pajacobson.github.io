@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2022-10-01">
+<meta name="dcterms.date" content="2022-10-02">
 
 <title>Paul Jacobson - Cyclistic Customer Analysis</title>
 <style>
@@ -171,7 +171,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 1, 2022</p>
+        <p class="date">October 2, 2022</p>
       </div>
     </div>
       
@@ -752,6 +752,8 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </section>
 <section id="data-cleaning" class="level3">
 <h3 data-anchor-id="data-cleaning">Data Cleaning</h3>
+<section id="missing-end-station-coordinates" class="level4">
+<h4 data-anchor-id="missing-end-station-coordinates">Missing end station coordinates</h4>
 <p>The end stations with missing name and coordinates are addressed first.</p>
 <div class="cell">
 <details>
@@ -860,7 +862,7 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 </div>
-<p>The preview of these rides contains several rides which extend for more than a day. Cyclistic treat bikes unlocked for more than 24 hours as stolen, so these are likely be bikes that have not been physically docked at the ride termination time.</p>
+<p>The preview of these rides contains several rides which extend for more than a day. Cyclistic treat bikes unlocked for more than 24 hours as stolen. These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -882,9 +884,223 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <p><img src="cyclistic_files/figure-html/unnamed-chunk-16-1.svg" width="672"></p>
 </div>
 </div>
-<p>The graph shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.</p>
+<p>The plot shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.</p>
+</section>
+<section id="cyclistic-operational-rides" class="level4">
+<h4 data-anchor-id="cyclistic-operational-rides">Cyclistic operational rides</h4>
+<p>A list of stations that were <em>In-Service</em> between September 2021 and August 2022 was extracted from a dataset maintained by City of Chicago. The dataset for the period of interest contains over 35 million rows recording the status of each docking station at hour intervals.</p>
+<p>Due to the size of the dataset the processed listing of stations is used in this analysis.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>active_stations <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/processed/stations_in_use.csv"</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>active_stations <span class="sc">%&gt;%</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>id)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<div id="tbl-stations-in-use">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;8: Stations recorded as in-service</caption>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 50%">
+<col style="width: 11%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">station_name</th>
+<th style="text-align: right;">latitude</th>
+<th style="text-align: right;">longitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Woodlawn Ave &amp; 75th St</td>
+<td style="text-align: right;">41.75916</td>
+<td style="text-align: right;">-87.59575</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Chicago Ave &amp; Sheridan Rd</td>
+<td style="text-align: right;">42.05049</td>
+<td style="text-align: right;">-87.67782</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 20:25:35</td>
+<td style="text-align: left;">Major Ave &amp; Bloomingdale Ave</td>
+<td style="text-align: right;">41.91259</td>
+<td style="text-align: right;">-87.76870</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-11-08 15:35:10</td>
+<td style="text-align: left;">Albany Ave &amp; 16th St</td>
+<td style="text-align: right;">41.85934</td>
+<td style="text-align: right;">-87.70182</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Kedzie Ave &amp; Palmer Ct</td>
+<td style="text-align: right;">41.92153</td>
+<td style="text-align: right;">-87.70732</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2022-07-07 14:15:27</td>
+<td style="text-align: left;">Public Rack - Kildare Ave &amp; Division St</td>
+<td style="text-align: right;">41.90239</td>
+<td style="text-align: right;">-87.73360</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>A random sample of stations from the dataset is shown in <a href="#tbl-stations-in-use">Table&nbsp;8</a>. The timestamp indicates the first time a station appears as <em>In-Service</em> in the original dataset.</p>
+<p>The active stations dataset is used to identify stations that were not listed as publicly available.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>unlisted_start <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    active_stations,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"start_station_name"</span> <span class="ot">=</span> <span class="st">"station_name"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">station_name =</span> start_station_name,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">station_id =</span> start_station_id</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>unlisted_end <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    active_stations,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"end_station_name"</span> <span class="ot">=</span> <span class="st">"station_name"</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">station_name =</span> end_station_name,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">station_id =</span> end_station_id</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>unlisted_stations <span class="ot">&lt;-</span> unlisted_start <span class="sc">%&gt;%</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(unlisted_end) <span class="sc">%&gt;%</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(station_name, station_id) <span class="sc">%&gt;%</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(station_name, station_id) <span class="sc">%&gt;%</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>())</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>unlisted_stations</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<div id="tbl-unlisted-stations">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;9: Unlisted stations</caption>
+<colgroup>
+<col style="width: 46%">
+<col style="width: 46%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">station_name</th>
+<th style="text-align: left;">station_id</th>
+<th style="text-align: right;">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Base - 2132 W Hubbard</td>
+<td style="text-align: left;">Hubbard Bike-checking (LBS-WH-TEST)</td>
+<td style="text-align: right;">1182</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Base - 2132 W Hubbard Warehouse</td>
+<td style="text-align: left;">Hubbard Bike-checking (LBS-WH-TEST)</td>
+<td style="text-align: right;">963</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bissell St &amp; Armitage Ave - Charging</td>
+<td style="text-align: left;">Bissell St &amp; Armitage Ave - Charging</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bissell St &amp; Armitage Ave - Charging</td>
+<td style="text-align: left;">chargingstx1</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DIVVY CASSETTE REPAIR MOBILE STATION</td>
+<td style="text-align: left;">DIVVY CASSETTE REPAIR MOBILE STATION</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hastings WH 2</td>
+<td style="text-align: left;">Hastings WH 2</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lincoln Ave &amp; Roscoe St - Charging</td>
+<td style="text-align: left;">Lincoln Ave &amp; Roscoe St - Charging</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NewHastings</td>
+<td style="text-align: left;">2059 Hastings Warehouse Station</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pawel Bialowas - Test- PBSC charging station</td>
+<td style="text-align: left;">Pawel Bialowas - Test- PBSC charging station</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Public Rack - Kedzie Ave &amp; 62nd Pl</td>
+<td style="text-align: left;">1038</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Throop/Hastings Mobile Station</td>
+<td style="text-align: left;">Throop/Hastings Mobile Station</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WEST CHI-WATSON</td>
+<td style="text-align: left;">DIVVY 001</td>
+<td style="text-align: right;">21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WEST CHI-WATSON</td>
+<td style="text-align: left;">DIVVY 001 - Warehouse test station</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WestChi</td>
+<td style="text-align: left;">DIVVY 001 - Warehouse test station</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wilton Ave &amp; Diversey Pkwy - Charging</td>
+<td style="text-align: left;">Wilton Ave &amp; Diversey Pkwy - Charging</td>
+<td style="text-align: right;">38</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p><a href="#tbl-unlisted-stations">Table&nbsp;9</a> summarises the stations that appear in <code>bike_rides</code> without a corresponding match in the <code>active_stations</code> dataset.</p>
+<p>The majority of stations in the table appear to have an operational function. Those ending with “- Charging” appear to be associated with testing of new charging stations prior to the company publicly announcing their availability.</p>
 
 
+</section>
 </section>
 </section>
 
