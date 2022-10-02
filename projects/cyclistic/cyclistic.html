@@ -867,18 +867,22 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="sc">%&gt;%</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(member_casual) <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">triptime =</span> <span class="fu">as.numeric</span>(started_at <span class="sc">%--%</span> ended_at, <span class="at">units =</span> <span class="st">"days"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(triptime, <span class="at">fill =</span> member_casual)) <span class="sc">+</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(member_casual)) <span class="sc">+</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with missing end coordinates by ride type"</span>,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Trip Duration in Days"</span>,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rides"</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">member_casual =</span> <span class="fu">recode</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    member_casual,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"member"</span> <span class="ot">=</span> <span class="st">"Member"</span>, <span class="st">"casual"</span> <span class="ot">=</span> <span class="st">"Casual"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(member_casual) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">triptime =</span> <span class="fu">as.numeric</span>(started_at <span class="sc">%--%</span> ended_at, <span class="at">units =</span> <span class="st">"days"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(triptime, <span class="at">fill =</span> member_casual)) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(member_casual)) <span class="sc">+</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with missing end coordinates by ride type"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Trip Duration in Days"</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rides"</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="cyclistic_files/figure-html/unnamed-chunk-16-1.svg" width="672"></p>
@@ -908,10 +912,10 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
 <colgroup>
-<col style="width: 21%">
-<col style="width: 57%">
-<col style="width: 9%">
+<col style="width: 24%">
+<col style="width: 53%">
 <col style="width: 10%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -923,40 +927,40 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2022-05-17 20:35:40</td>
-<td style="text-align: left;">East End Ave &amp; 87th St</td>
-<td style="text-align: right;">41.73705</td>
-<td style="text-align: right;">-87.58400</td>
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Ravenswood Ave &amp; Irving Park Rd</td>
+<td style="text-align: right;">41.95469</td>
+<td style="text-align: right;">-87.67393</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">Western Ave &amp; 111th St - SW</td>
+<td style="text-align: right;">41.69161</td>
+<td style="text-align: right;">-87.68152</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2022-08-30 17:45:38</td>
+<td style="text-align: left;">Public Rack - Pullman - Ross Dress for Less</td>
+<td style="text-align: right;">41.69868</td>
+<td style="text-align: right;">-87.59700</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">Halsted St &amp; 64th St</td>
+<td style="text-align: right;">41.77744</td>
+<td style="text-align: right;">-87.64454</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">2022-08-29 19:15:57</td>
-<td style="text-align: left;">Public Rack - May St &amp; 87th St</td>
-<td style="text-align: right;">41.73556</td>
-<td style="text-align: right;">-87.65170</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Spaulding Ave &amp; Division St</td>
-<td style="text-align: right;">41.90271</td>
-<td style="text-align: right;">-87.70922</td>
+<td style="text-align: left;">Public Rack - Fairfield Ave &amp; 63rd St</td>
+<td style="text-align: right;">41.77926</td>
+<td style="text-align: right;">-87.69270</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - Menard Ave &amp; Grand Ave</td>
-<td style="text-align: right;">41.91979</td>
-<td style="text-align: right;">-87.77098</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Loomis St &amp; Lexington St</td>
-<td style="text-align: right;">41.87219</td>
-<td style="text-align: right;">-87.66150</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - Spencer Elementary Technology Academy</td>
-<td style="text-align: right;">41.88466</td>
-<td style="text-align: right;">-87.75050</td>
+<td style="text-align: left;">Public Rack - Woodlawn Ave &amp; 63rd St - SE</td>
+<td style="text-align: right;">41.77948</td>
+<td style="text-align: right;">-87.59603</td>
 </tr>
 </tbody>
 </table>
@@ -1480,18 +1484,19 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(month, nrt)) <span class="sc">+</span></span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with negative duration"</span>,</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage of Rides"</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with negative duration"</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage of Rides"</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="cyclistic_files/figure-html/unnamed-chunk-22-1.svg" width="672"></p>
 </div>
 </div>
-<p>The plot indicates that November has far higher percentage of rides with negative durations than other months. This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.</p>
-<p>Ride start and end timestamps do not provide timezone data. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.</p>
+<p>The plot indicates that the percentage of negative ride duration is around three times higher in November than the next highest month - September. This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.</p>
+<p>Ride start and end timestamps values in the dataset do not include timezone information. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.</p>
 
 
 </section>
