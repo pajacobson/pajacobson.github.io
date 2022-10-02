@@ -377,6 +377,10 @@ The preview of these rides contains several rides which extend for more than a d
 #| dev: "svg"
 
 no_end_coords %>%
+  mutate(member_casual = recode(
+    member_casual,
+    "member" = "Member", "casual" = "Casual"
+  )) %>%
   group_by(member_casual) %>%
   summarise(triptime = as.numeric(started_at %--% ended_at, units = "days")) %>%
   ggplot(aes(triptime, fill = member_casual)) +
@@ -388,7 +392,7 @@ no_end_coords %>%
     x = "Trip Duration in Days",
     y = "Rides"
   ) +
-  theme_bw()
+  theme_minimal()
 ```
 
 The plot shows that around 5000 of the 5727 rides terminated after more than 24 hours. Notably casual rides are the biggest contributor.
@@ -524,14 +528,14 @@ bike_rides %>%
   ) %>%
   ggplot(aes(month, nrt)) +
   geom_col() +
+  theme_minimal() +
   labs(
     title = "Rides with negative duration",
     x = "Month",
     y = "Percentage of Rides"
   )
 ```
-The plot indicates that November has far higher percentage of rides with negative durations than other months.
-This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.
+The plot indicates that the percentage of negative ride duration is around three times higher in November than the next highest month - September. This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.
 
-Ride start and end timestamps do not provide timezone data. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.
+Ride start and end timestamps values in the dataset do not include timezone information. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.
 
