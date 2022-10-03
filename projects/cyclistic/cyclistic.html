@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2022-10-02">
+<meta name="dcterms.date" content="2022-10-03">
 
 <title>Paul Jacobson - Cyclistic Customer Analysis</title>
 <style>
@@ -171,7 +171,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 2, 2022</p>
+        <p class="date">October 3, 2022</p>
       </div>
     </div>
       
@@ -321,8 +321,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </details>
 </div>
-<p>The first 1000 rows are read from September 2021 zip file. <code>read_csv</code> uses the first 1000 rows to determine the type of data in each column.</p>
-<p>The “guessed” column type specification can inspected using the <code>spec</code> function.</p>
+<p>The first 1000 rows are read from September 2021 zip file. This allows <code>read_csv</code> to determine the type of data in each column. The “guessed” column type specification can then inspected using the <code>spec</code> function.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -390,7 +389,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>After verifying the detected formats, and checking column naming is consistent across all files, the full dataset can be imported. Passing the full column specification to <code>read_csv()</code> ensure that data which does not match the expected type is flagged as a problem. Issues that arise while importing data can be examined using the <code>problems()</code> function.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-6_7ebde1549cd4a8c9008f65ee103ce821">
+<div class="cell" data-hash="cyclistic_cache/html/code-import-from-zip_0ef5ebe9f08921c121f122a1baa89f46">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
@@ -452,7 +451,7 @@ $ end_lng            &lt;dbl&gt; -87.67, -87.67, -87.72, -87.72, -87.71, -87.74,
 $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual, cas…</code></pre>
 </div>
 </div>
-<p>The output indicates that the data set has 5883043 rows, and 13 columns. The <code>start_station_name</code>, <code>start_stattion_id</code>, <code>end_station_name</code> and <code>end_station_id</code> columns appear to have a number of missing –<code>NA</code>– values.</p>
+<p>The output indicates that the data set has 5883043 rows, and 13 columns. The <code>start_station_name</code>, <code>start_stattion_id</code>, <code>end_station_name</code> and <code>end_station_id</code> columns appear to have a number of missing values - identified by <code>NA</code>.</p>
 <p>The extent of the missing information can be assessed by counting the number of <code>NA</code> values in each column.</p>
 <div class="cell">
 <details>
@@ -580,7 +579,7 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 </div>
-<p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for at least one docking station. This represents significant number of data points, and should be checked to determine whether this is an error or there has been systematic changes made.</p>
+<p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for at least one docking station. This represents significant number of data points, and should be checked to determine whether this is an error or there have been systematic changes made.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -911,12 +910,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <div id="tbl-stations-in-use">
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
-<colgroup>
-<col style="width: 24%">
-<col style="width: 53%">
-<col style="width: 10%">
-<col style="width: 12%">
-</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">timestamp</th>
@@ -927,40 +920,40 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Ravenswood Ave &amp; Irving Park Rd</td>
-<td style="text-align: right;">41.95469</td>
-<td style="text-align: right;">-87.67393</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Western Ave &amp; 111th St - SW</td>
-<td style="text-align: right;">41.69161</td>
-<td style="text-align: right;">-87.68152</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-08-30 17:45:38</td>
-<td style="text-align: left;">Public Rack - Pullman - Ross Dress for Less</td>
-<td style="text-align: right;">41.69868</td>
-<td style="text-align: right;">-87.59700</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Halsted St &amp; 64th St</td>
-<td style="text-align: right;">41.77744</td>
-<td style="text-align: right;">-87.64454</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-08-29 19:15:57</td>
-<td style="text-align: left;">Public Rack - Fairfield Ave &amp; 63rd St</td>
-<td style="text-align: right;">41.77926</td>
-<td style="text-align: right;">-87.69270</td>
+<td style="text-align: left;">2021-10-14 21:25:35</td>
+<td style="text-align: left;">Central Park Ave &amp; Ohio St</td>
+<td style="text-align: right;">41.89187</td>
+<td style="text-align: right;">-87.71639</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - Woodlawn Ave &amp; 63rd St - SE</td>
-<td style="text-align: right;">41.77948</td>
-<td style="text-align: right;">-87.59603</td>
+<td style="text-align: left;">Public Rack - Franklin Park</td>
+<td style="text-align: right;">41.86149</td>
+<td style="text-align: right;">-87.73340</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">N Damen Ave &amp; W Chicago Ave</td>
+<td style="text-align: right;">41.89581</td>
+<td style="text-align: right;">-87.67852</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Homewood Ave &amp; 115th St</td>
+<td style="text-align: right;">41.68460</td>
+<td style="text-align: right;">-87.67071</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2022-05-17 20:35:40</td>
+<td style="text-align: left;">Bensley Ave &amp; 103rd St</td>
+<td style="text-align: right;">41.70840</td>
+<td style="text-align: right;">-87.56319</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Lincoln Ave &amp; Fullerton Ave</td>
+<td style="text-align: right;">41.92591</td>
+<td style="text-align: right;">-87.64926</td>
 </tr>
 </tbody>
 </table>
@@ -1132,13 +1125,13 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;10: Sample of cleaned data</caption>
 <colgroup>
-<col style="width: 8%">
+<col style="width: 7%">
 <col style="width: 6%">
 <col style="width: 9%">
 <col style="width: 9%">
 <col style="width: 12%">
-<col style="width: 8%">
-<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 14%">
 <col style="width: 7%">
 <col style="width: 4%">
 <col style="width: 4%">
@@ -1165,93 +1158,93 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">48C223B9A99DBB19</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-03-24 23:52:48</td>
-<td style="text-align: left;">2022-03-25 00:00:30</td>
-<td style="text-align: left;">Wells St &amp; Concord Ln</td>
-<td style="text-align: left;">TA1308000050</td>
-<td style="text-align: left;">Stockton Dr &amp; Wrightwood Ave</td>
-<td style="text-align: left;">13276</td>
-<td style="text-align: right;">41.91203</td>
-<td style="text-align: right;">-87.63480</td>
-<td style="text-align: right;">41.93132</td>
-<td style="text-align: right;">-87.63874</td>
+<td style="text-align: left;">4A633974C0BDB7AC</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-08-11 17:09:12</td>
+<td style="text-align: left;">2022-08-11 17:19:35</td>
+<td style="text-align: left;">University Ave &amp; 57th St</td>
+<td style="text-align: left;">KA1503000071</td>
+<td style="text-align: left;">Kimbark Ave &amp; 53rd St</td>
+<td style="text-align: left;">TA1309000037</td>
+<td style="text-align: right;">41.79148</td>
+<td style="text-align: right;">-87.59986</td>
+<td style="text-align: right;">41.79957</td>
+<td style="text-align: right;">-87.59475</td>
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">FDC10A25C3856ACD</td>
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-06-26 22:41:03</td>
-<td style="text-align: left;">2022-06-26 23:16:02</td>
-<td style="text-align: left;">Fairbanks Ct &amp; Grand Ave</td>
-<td style="text-align: left;">TA1305000003</td>
+<td style="text-align: left;">29BB7E99AED8F3F0</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2021-10-19 12:25:16</td>
+<td style="text-align: left;">2021-10-19 12:29:53</td>
+<td style="text-align: left;">900 W Harrison St</td>
+<td style="text-align: left;">13028</td>
+<td style="text-align: left;">Sangamon St &amp; Washington Blvd</td>
+<td style="text-align: left;">13409</td>
+<td style="text-align: right;">41.87479</td>
+<td style="text-align: right;">-87.64978</td>
+<td style="text-align: right;">41.88303</td>
+<td style="text-align: right;">-87.65107</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7CC19BAD6C199498</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2021-10-25 19:58:31</td>
+<td style="text-align: left;">2021-10-25 20:08:18</td>
+<td style="text-align: left;">Wilton Ave &amp; Diversey Pkwy</td>
+<td style="text-align: left;">TA1306000014</td>
+<td style="text-align: left;">Broadway &amp; Waveland Ave</td>
+<td style="text-align: left;">13325</td>
+<td style="text-align: right;">41.93244</td>
+<td style="text-align: right;">-87.65281</td>
+<td style="text-align: right;">41.94908</td>
+<td style="text-align: right;">-87.64855</td>
+<td style="text-align: left;">member</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A6E2C906370DDEA6</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: left;">2022-07-20 15:20:28</td>
+<td style="text-align: left;">2022-07-20 15:31:40</td>
 <td style="text-align: left;">Clark St &amp; Elm St</td>
 <td style="text-align: left;">TA1307000039</td>
-<td style="text-align: right;">41.89185</td>
-<td style="text-align: right;">-87.62058</td>
-<td style="text-align: right;">41.90297</td>
-<td style="text-align: right;">-87.63128</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.90262</td>
+<td style="text-align: right;">-87.63180</td>
+<td style="text-align: right;">41.89000</td>
+<td style="text-align: right;">-87.65000</td>
 <td style="text-align: left;">casual</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">6B937C9CB90BE3D8</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-12-07 18:03:05</td>
-<td style="text-align: left;">2021-12-07 18:18:36</td>
-<td style="text-align: left;">Halsted St &amp; Clybourn Ave</td>
-<td style="text-align: left;">331</td>
-<td style="text-align: left;">Broadway &amp; Belmont Ave</td>
-<td style="text-align: left;">13277</td>
-<td style="text-align: right;">41.90957</td>
-<td style="text-align: right;">-87.64804</td>
-<td style="text-align: right;">41.94012</td>
-<td style="text-align: right;">-87.64534</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">5A52980DD29877DC</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-07-05 09:32:48</td>
-<td style="text-align: left;">2022-07-05 09:33:03</td>
-<td style="text-align: left;">Halsted St &amp; 76th St</td>
-<td style="text-align: left;">724</td>
-<td style="text-align: left;">Halsted St &amp; 76th St</td>
-<td style="text-align: left;">724</td>
-<td style="text-align: right;">41.76000</td>
-<td style="text-align: right;">-87.64000</td>
-<td style="text-align: right;">41.76000</td>
-<td style="text-align: right;">-87.64000</td>
-<td style="text-align: left;">casual</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1944CE1A2EF3878D</td>
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-03-22 07:46:26</td>
-<td style="text-align: left;">2022-03-22 07:52:07</td>
-<td style="text-align: left;">LaSalle St &amp; Illinois St</td>
-<td style="text-align: left;">13430</td>
-<td style="text-align: left;">Clinton St &amp; Madison St</td>
-<td style="text-align: left;">TA1305000032</td>
-<td style="text-align: right;">41.89084</td>
-<td style="text-align: right;">-87.63159</td>
-<td style="text-align: right;">41.88224</td>
-<td style="text-align: right;">-87.64107</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CC380D07CA3CE2D2</td>
+<td style="text-align: left;">1F32E534D31CC114</td>
 <td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2022-04-18 17:52:29</td>
-<td style="text-align: left;">2022-04-18 18:00:09</td>
-<td style="text-align: left;">State St &amp; Chicago Ave</td>
-<td style="text-align: left;">21544</td>
-<td style="text-align: left;">Clybourn Ave &amp; Division St</td>
-<td style="text-align: left;">TA1307000115</td>
-<td style="text-align: right;">41.89662</td>
-<td style="text-align: right;">-87.62858</td>
-<td style="text-align: right;">41.90461</td>
-<td style="text-align: right;">-87.64055</td>
+<td style="text-align: left;">2022-08-01 13:12:18</td>
+<td style="text-align: left;">2022-08-01 13:29:00</td>
+<td style="text-align: left;">Laramie Ave &amp; Gladys Ave</td>
+<td style="text-align: left;">543</td>
+<td style="text-align: left;">Cicero Ave &amp; Flournoy St</td>
+<td style="text-align: left;">16912</td>
+<td style="text-align: right;">41.87581</td>
+<td style="text-align: right;">-87.75529</td>
+<td style="text-align: right;">41.87213</td>
+<td style="text-align: right;">-87.74662</td>
+<td style="text-align: left;">casual</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">08BD94378025058A</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-08-03 17:58:12</td>
+<td style="text-align: left;">2022-08-03 18:11:51</td>
+<td style="text-align: left;">Clark St &amp; Ida B Wells Dr</td>
+<td style="text-align: left;">TA1305000009</td>
+<td style="text-align: left;">Sangamon St &amp; Lake St</td>
+<td style="text-align: left;">TA1306000015</td>
+<td style="text-align: right;">41.87593</td>
+<td style="text-align: right;">-87.63058</td>
+<td style="text-align: right;">41.88578</td>
+<td style="text-align: right;">-87.65102</td>
 <td style="text-align: left;">member</td>
 </tr>
 </tbody>
@@ -1264,7 +1257,10 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </section>
 <section id="ride-duration" class="level4">
 <h4 data-anchor-id="ride-duration">Ride duration</h4>
-<div class="cell">
+<section id="adding-ride-duration-time-and-day-of-week" class="level5">
+<h5 data-anchor-id="adding-ride-duration-time-and-day-of-week">Adding Ride Duration, Time and Day of Week</h5>
+<p>To add analysis calculated columns for the length of ride, the hour the ride started and the day of week are added to the dataset.</p>
+<div class="cell" data-hash="cyclistic_cache/html/tbl-add-duration_be75b1b0246111fe383f45d0a9a22530">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1277,7 +1273,7 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ride_id) <span class="sc">%&gt;%</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ride_id, <span class="sc">-</span>ride_int) <span class="sc">%&gt;%</span></span>
 <span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">6</span>)</span></code></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1287,20 +1283,19 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <caption>Table&nbsp;11: Sample of rides with duration</caption>
 <colgroup>
 <col style="width: 5%">
-<col style="width: 7%">
-<col style="width: 7%">
-<col style="width: 17%">
 <col style="width: 8%">
-<col style="width: 1%">
-<col style="width: 1%">
+<col style="width: 8%">
 <col style="width: 9%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 13%">
 <col style="width: 6%">
-<col style="width: 10%">
-<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 4%">
 <col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
+<col style="width: 4%">
 <col style="width: 5%">
 </colgroup>
 <thead>
@@ -1308,7 +1303,6 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <th style="text-align: left;">rideable_type</th>
 <th style="text-align: left;">started_at</th>
 <th style="text-align: left;">ended_at</th>
-<th style="text-align: right;">ride_int</th>
 <th style="text-align: right;">ride_time</th>
 <th style="text-align: right;">hour</th>
 <th style="text-align: left;">day</th>
@@ -1325,111 +1319,105 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-06-19 13:53:59</td>
-<td style="text-align: left;">2022-06-19 14:20:50</td>
-<td style="text-align: right;">2022-06-19 13:53:59 CDT–2022-06-19 14:20:50 CDT</td>
-<td style="text-align: right;">1611s (~26.85 minutes)</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: left;">Sun</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">Western Ave &amp; Winnebago Ave</td>
-<td style="text-align: left;">13068</td>
-<td style="text-align: right;">41.91000</td>
-<td style="text-align: right;">-87.62000</td>
-<td style="text-align: right;">41.91552</td>
-<td style="text-align: right;">-87.68702</td>
-<td style="text-align: left;">member</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-08-31 14:51:47</td>
+<td style="text-align: left;">2022-08-31 15:09:00</td>
+<td style="text-align: right;">1033s (~17.22 minutes)</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Clark St &amp; Winnemac Ave</td>
+<td style="text-align: left;">TA1309000035</td>
+<td style="text-align: left;">Montrose Harbor</td>
+<td style="text-align: left;">TA1308000012</td>
+<td style="text-align: right;">41.97335</td>
+<td style="text-align: right;">-87.66786</td>
+<td style="text-align: right;">41.96398</td>
+<td style="text-align: right;">-87.63818</td>
+<td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-10-13 19:44:31</td>
-<td style="text-align: left;">2021-10-13 19:48:36</td>
-<td style="text-align: right;">2021-10-13 19:44:31 CDT–2021-10-13 19:48:36 CDT</td>
-<td style="text-align: right;">245s (~4.08 minutes)</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: left;">Wed</td>
-<td style="text-align: left;">Blue Island Ave &amp; 18th St</td>
-<td style="text-align: left;">13135</td>
-<td style="text-align: left;">Morgan St &amp; 18th St</td>
-<td style="text-align: left;">13163</td>
-<td style="text-align: right;">41.85756</td>
-<td style="text-align: right;">-87.66154</td>
-<td style="text-align: right;">41.85809</td>
-<td style="text-align: right;">-87.65107</td>
-<td style="text-align: left;">member</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-03-24 16:37:16</td>
-<td style="text-align: left;">2022-03-24 16:46:33</td>
-<td style="text-align: right;">2022-03-24 16:37:16 CDT–2022-03-24 16:46:33 CDT</td>
-<td style="text-align: right;">557s (~9.28 minutes)</td>
+<td style="text-align: left;">2021-09-15 16:37:58</td>
+<td style="text-align: left;">2021-09-15 16:48:35</td>
+<td style="text-align: right;">637s (~10.62 minutes)</td>
 <td style="text-align: right;">16</td>
-<td style="text-align: left;">Thu</td>
-<td style="text-align: left;">Wabash Ave &amp; Grand Ave</td>
-<td style="text-align: left;">TA1307000117</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Clark St &amp; Elm St</td>
+<td style="text-align: left;">TA1307000039</td>
 <td style="text-align: left;">Clinton St &amp; Washington Blvd</td>
 <td style="text-align: left;">WL-012</td>
-<td style="text-align: right;">41.89130</td>
-<td style="text-align: right;">-87.62614</td>
+<td style="text-align: right;">41.90297</td>
+<td style="text-align: right;">-87.63128</td>
 <td style="text-align: right;">41.88338</td>
 <td style="text-align: right;">-87.64117</td>
 <td style="text-align: left;">member</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-04-10 18:09:29</td>
+<td style="text-align: left;">2022-04-10 18:15:02</td>
+<td style="text-align: right;">333s (~5.55 minutes)</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">DuSable Lake Shore Dr &amp; Monroe St</td>
+<td style="text-align: left;">13300</td>
+<td style="text-align: left;">Field Blvd &amp; South Water St</td>
+<td style="text-align: left;">15534</td>
+<td style="text-align: right;">41.88096</td>
+<td style="text-align: right;">-87.61674</td>
+<td style="text-align: right;">41.88635</td>
+<td style="text-align: right;">-87.61752</td>
+<td style="text-align: left;">member</td>
+</tr>
 <tr class="even">
-<td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2022-07-18 17:51:31</td>
-<td style="text-align: left;">2022-07-18 18:03:14</td>
-<td style="text-align: right;">2022-07-18 17:51:31 CDT–2022-07-18 18:03:14 CDT</td>
-<td style="text-align: right;">703s (~11.72 minutes)</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: left;">Mon</td>
-<td style="text-align: left;">Theater on the Lake</td>
-<td style="text-align: left;">TA1308000001</td>
-<td style="text-align: left;">Lincoln Ave &amp; Diversey Pkwy</td>
-<td style="text-align: left;">TA1307000064</td>
-<td style="text-align: right;">41.92627</td>
-<td style="text-align: right;">-87.63098</td>
-<td style="text-align: right;">41.93223</td>
-<td style="text-align: right;">-87.65862</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: left;">2022-07-02 14:26:46</td>
+<td style="text-align: left;">2022-07-02 14:29:40</td>
+<td style="text-align: right;">174s (~2.9 minutes)</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">DuSable Lake Shore Dr &amp; North Blvd</td>
+<td style="text-align: left;">LF-005</td>
+<td style="text-align: left;">Clark St &amp; North Ave</td>
+<td style="text-align: left;">13128</td>
+<td style="text-align: right;">41.91172</td>
+<td style="text-align: right;">-87.62680</td>
+<td style="text-align: right;">41.91197</td>
+<td style="text-align: right;">-87.63194</td>
 <td style="text-align: left;">member</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">classic_bike</td>
-<td style="text-align: left;">2021-11-21 15:24:47</td>
-<td style="text-align: left;">2021-11-21 15:32:30</td>
-<td style="text-align: right;">2021-11-21 15:24:47 CST–2021-11-21 15:32:30 CST</td>
-<td style="text-align: right;">463s (~7.72 minutes)</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: left;">Sun</td>
-<td style="text-align: left;">Ellis Ave &amp; 55th St</td>
-<td style="text-align: left;">KA1504000076</td>
-<td style="text-align: left;">Harper Ave &amp; 59th St</td>
-<td style="text-align: left;">KA1503000070</td>
-<td style="text-align: right;">41.79430</td>
-<td style="text-align: right;">-87.60145</td>
-<td style="text-align: right;">41.78794</td>
-<td style="text-align: right;">-87.58832</td>
-<td style="text-align: left;">member</td>
+<td style="text-align: left;">docked_bike</td>
+<td style="text-align: left;">2021-09-03 14:51:56</td>
+<td style="text-align: left;">2021-09-03 15:22:12</td>
+<td style="text-align: right;">1816s (~30.27 minutes)</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">Streeter Dr &amp; Grand Ave</td>
+<td style="text-align: left;">13022</td>
+<td style="text-align: left;">Sheffield Ave &amp; Wrightwood Ave</td>
+<td style="text-align: left;">TA1309000023</td>
+<td style="text-align: right;">41.89228</td>
+<td style="text-align: right;">-87.61204</td>
+<td style="text-align: right;">41.92871</td>
+<td style="text-align: right;">-87.65383</td>
+<td style="text-align: left;">casual</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">electric_bike</td>
-<td style="text-align: left;">2021-11-11 07:33:57</td>
-<td style="text-align: left;">2021-11-11 07:45:09</td>
-<td style="text-align: right;">2021-11-11 07:33:57 CST–2021-11-11 07:45:09 CST</td>
-<td style="text-align: right;">672s (~11.2 minutes)</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: left;">Thu</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: right;">41.94000</td>
-<td style="text-align: right;">-87.67000</td>
-<td style="text-align: right;">41.92000</td>
-<td style="text-align: right;">-87.65000</td>
+<td style="text-align: left;">2022-07-20 12:20:32</td>
+<td style="text-align: left;">2022-07-20 12:42:28</td>
+<td style="text-align: right;">1316s (~21.93 minutes)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Theater on the Lake</td>
+<td style="text-align: left;">TA1308000001</td>
+<td style="text-align: left;">Lakefront Trail &amp; Bryn Mawr Ave</td>
+<td style="text-align: left;">15576</td>
+<td style="text-align: right;">41.92625</td>
+<td style="text-align: right;">-87.63100</td>
+<td style="text-align: right;">41.98404</td>
+<td style="text-align: right;">-87.65228</td>
 <td style="text-align: left;">member</td>
 </tr>
 </tbody>
@@ -1438,15 +1426,16 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 </div>
-<div class="cell">
+<p><a href="#tbl-add-duration">Table&nbsp;11</a> shows a sample of the resulting dataset with added columns.</p>
+<p>Minimum and maximum ride times can now be checked for plausibility.</p>
+<div class="cell" data-hash="cyclistic_cache/html/tbl-ride-min-max_5341c66ca45b33958ccb0c1054d335da">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Minimum =</span> <span class="fu">min</span>(ride_time) <span class="sc">/</span> <span class="dv">3600</span>,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Maximum =</span> <span class="fu">max</span>(ride_time) <span class="sc">/</span> <span class="dv">3600</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Rides with negative time"</span> <span class="ot">=</span> <span class="fu">sum</span>(ride_time <span class="sc">&lt;</span> <span class="dv">0</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Maximum =</span> <span class="fu">max</span>(ride_time) <span class="sc">/</span> <span class="dv">3600</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -1457,14 +1446,12 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <tr class="header">
 <th style="text-align: right;">Minimum</th>
 <th style="text-align: right;">Maximum</th>
-<th style="text-align: right;">Rides with negative time</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">-2.290278</td>
 <td style="text-align: right;">678.4169</td>
-<td style="text-align: right;">134</td>
 </tr>
 </tbody>
 </table>
@@ -1472,6 +1459,10 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 </div>
 </div>
 </div>
+<p>Rides with negative duration should not occur, so this needs to be checked and corrected.</p>
+</section>
+<section id="addressing-negative-ride-durations" class="level5">
+<h5 data-anchor-id="addressing-negative-ride-durations">Addressing negative ride durations</h5>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -1495,10 +1486,229 @@ $ member_casual      &lt;fct&gt; casual, casual, casual, casual, casual, casual,
 <p><img src="cyclistic_files/figure-html/unnamed-chunk-22-1.svg" width="672"></p>
 </div>
 </div>
-<p>The plot indicates that the percentage of negative ride duration is around three times higher in November than the next highest month - September. This appears to be due to the end of daylight savings at 2.00am on 7 November 2021.</p>
-<p>Ride start and end timestamps values in the dataset do not include timezone information. As a result rides which included the timezone change may appear to be one hour shorter than actual ride time.</p>
+<p>The plot indicates that the precentage rides with negative ride durations is around three times higher in November than the next highest month - September.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(started_at) <span class="sc">==</span> <span class="dv">11</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">"Day"</span> <span class="ot">=</span> <span class="fu">day</span>(started_at)) <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">"Percent Negative"</span> <span class="ot">=</span> <span class="fu">mean</span>(ride_time <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Percent Negative</span><span class="st">`</span> <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<div id="tbl-days-neg-rides">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;13: Days in November 2021 with negative ride time</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Day</th>
+<th style="text-align: right;">Percent Negative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0.2781276</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>All rides with negative duration in November occurred on the 7th.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">month</span>(started_at) <span class="sc">==</span> <span class="dv">11</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">day</span>(started_at) <span class="sc">==</span> <span class="dv">7</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">Hour =</span> <span class="fu">hour</span>(started_at)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Percent Negative"</span> <span class="ot">=</span> <span class="fu">mean</span>(ride_time <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Count =</span> <span class="fu">sum</span>(ride_time <span class="sc">&lt;</span> <span class="dv">0</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Percent Negative</span><span class="st">`</span> <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<div id="tbl-hour-neg-rides">
+<table class="table table-sm table-striped">
+<caption>Table&nbsp;14: Negative ride duration by hour</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Hour</th>
+<th style="text-align: right;">Percent Negative</th>
+<th style="text-align: right;">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10.51587</td>
+<td style="text-align: right;">53</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p><a href="#tbl-hour-neg-rides">Table&nbsp;14</a> shows that all negative ride durations on 7th November were taken between 1.00am and 2.00am. This coincides with the end of daylight savings in Chicago. At 2.00am clocks went back one hour to 1.00am.</p>
+<p>Ride start and end timestamp values in the dataset do not include timezone information. Timestamps between 1.00am and 2.00am could refer to either Central Daylight Time or Central Standard Time meaning there is an ambiguity which is very difficult to resolve.</p>
+<p>The negative duration of rides which start and end between 1.00am and 2.00am can be resolved by adding 60 minutes. However the ambiguity of the rides which have one end point in this time range remains.</p>
+<p>I recommend that timezone be recorded as part of the timestamp in future to avoid these issues.</p>
+<p>For the present analysis I’ve chosen to correct the negative timestamps between 1.00am and 2.00am and to leave the ambiguous timestamps unaltered.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ride_time =</span> <span class="fu">if_else</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    (ride_time <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (<span class="fu">date</span>(started_at) <span class="sc">==</span> <span class="fu">date</span>(<span class="st">"2021-11-07"</span>)),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    ride_time <span class="sc">+</span> <span class="dv">3600</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    ride_time</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  ))</span></code></pre></div>
+</details>
+</div>
+</section>
+<section id="other-ride-duration-issues" class="level5">
+<h5 data-anchor-id="other-ride-duration-issues">Other ride duration issues</h5>
+<p>The Cyclistic website indicates that rides of less than 60 seconds have been removed from the dataset. Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined $1200.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ride_time <span class="sc">&gt;=</span> <span class="dv">60</span>, ride_time <span class="sc">&lt;=</span> <span class="dv">21600</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(member_casual, rideable_type) <span class="sc">%&gt;%</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">median =</span> <span class="fu">as.numeric</span>(<span class="fu">median</span>(ride_time), <span class="at">units =</span> <span class="st">"secs"</span>),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">exp</span>(<span class="fu">mean</span>(<span class="fu">log</span>(ride_time))),</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd =</span> <span class="fu">exp</span>(<span class="fu">sd</span>(<span class="fu">log</span>(ride_time))),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">iqr =</span> <span class="fu">IQR</span>(ride_time),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="fu">quantile</span>(ride_time, <span class="fl">0.75</span>) <span class="sc">+</span> iqr <span class="sc">*</span> <span class="fl">1.5</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'member_casual'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 5%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_casual</th>
+<th style="text-align: left;">rideable_type</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">iqr</th>
+<th style="text-align: right;">outliers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">member</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: right;">576</td>
+<td style="text-align: right;">580.8936</td>
+<td style="text-align: right;">2.164365</td>
+<td style="text-align: right;">656</td>
+<td style="text-align: right;">1978s (~32.97 minutes)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">member</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: right;">517</td>
+<td style="text-align: right;">523.0511</td>
+<td style="text-align: right;">2.171498</td>
+<td style="text-align: right;">579</td>
+<td style="text-align: right;">1753.5s (~29.23 minutes)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">casual</td>
+<td style="text-align: left;">classic_bike</td>
+<td style="text-align: right;">907</td>
+<td style="text-align: right;">952.9159</td>
+<td style="text-align: right;">2.380691</td>
+<td style="text-align: right;">1101</td>
+<td style="text-align: right;">3287.5s (~54.79 minutes)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">casual</td>
+<td style="text-align: left;">docked_bike</td>
+<td style="text-align: right;">1664</td>
+<td style="text-align: right;">1733.8565</td>
+<td style="text-align: right;">2.455082</td>
+<td style="text-align: right;">2152</td>
+<td style="text-align: right;">6350s (~1.76 hours)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">casual</td>
+<td style="text-align: left;">electric_bike</td>
+<td style="text-align: right;">722</td>
+<td style="text-align: right;">742.7065</td>
+<td style="text-align: right;">2.280275</td>
+<td style="text-align: right;">836</td>
+<td style="text-align: right;">2517s (~41.95 minutes)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>n3 <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">nrow</span>(bike_rides) <span class="sc">*</span> <span class="fl">0.001</span>, <span class="dv">0</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(ride_time, <span class="at">n =</span> n3) <span class="sc">%&gt;%</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Min =</span> <span class="fu">min</span>(ride_time) <span class="sc">/</span> <span class="dv">3600</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Max =</span> <span class="fu">max</span>(ride_time) <span class="sc">/</span> <span class="dv">3600</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">Min</th>
+<th style="text-align: right;">Max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">5759</td>
+<td style="text-align: right;">3.546111</td>
+<td style="text-align: right;">5.999444</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 
 
+</section>
 </section>
 </section>
 </section>
