@@ -605,6 +605,7 @@ chi_map <- get_stamenmap(
 )
 ```
 ```{r, fig.height = 8}
+#| label: fig-location-compare
 #| warning: false
 #| dev: "svg"
 
