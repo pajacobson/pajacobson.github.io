@@ -670,13 +670,13 @@ Minimum and maximum ride times can now be checked for plausibility.
 #| label: tbl-ride-min-max
 #| tbl-cap: "Summary of ride duration (hours)"
 #| cache: true
-
 bike_rides %>%
   summarise(
     Minimum = min(ride_time) / 3600,
     Maximum = max(ride_time) / 3600
   )
 ```
+
 Rides with negative duration should not occur, so this needs to be checked and corrected.
 
 ##### Addressing negative ride durations
@@ -685,6 +685,7 @@ Rides with negative duration should not occur, so this needs to be checked and c
 #| label: fig-negative-ride-duration
 #| fig-cap: "Distribution of negative ride times by month"
 #| dev: "svg"
+
 bike_rides %>%
   group_by(
     month = floor_date(as.Date(started_at), "month")
@@ -707,14 +708,17 @@ The plot indicates that the percentage rides with negative ride durations is aro
 ```{r}
 #| label: tbl-days-neg-rides
 #| tbl-cap: "Days in November 2021 with negative ride time"
+#| warning: false
+
 bike_rides %>%
   group_by(month, dom = day(started_at)) %>%
-  summarise("Percent Negative" = mean(ride_time < 0) * 100) %>%
+  summarise("Percent Negative" = mean(ride_time < 0) * 100, .groups = "drop") %>%
   filter(`Percent Negative` > 0) %>%
-  arrange(desc(`Percent Negative`))
+  slice_max(`Percent Negative`, n = 6)
 ```
 
 All rides with negative duration in November occurred on the 7th.
+
 
 ```{r}
 #| label: tbl-hour-neg-rides
@@ -761,6 +765,7 @@ bike_rides <- bike_rides %>%
 
 The Cyclistic website indicates that rides of less than 60 seconds have been removed from the dataset.
 Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined \$1200.
+
 
 ```{r}
 bike_rides <- bike_rides %>%
