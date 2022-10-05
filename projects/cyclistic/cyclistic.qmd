@@ -1,5 +1,4 @@
 ---
-
 title: "Cyclistic Customer Analysis"
 subtitle: "Google Data Analytics Certificate Capstone"
 date: today
@@ -102,7 +101,7 @@ This information is used to assist identifying Divvy operational rides in the da
 ### Initial import
 
 ```{r libraries}
-#| label: code-load-libraries
+#| label: lst-load-libraries
 #| warning: false
 #| echo: false
 library(tidyverse)
@@ -111,12 +110,11 @@ library(glue)
 library(archive)
 ```
 
-
 The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
 This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
 
 ```{r}
-#| label: code-file-list
+#| label: lst-file-list
 #| lst-cap: "Building file list"
 
 divvy_files <- seq(
@@ -145,7 +143,7 @@ to_dl <- divvy_files[!file.exists(divvy_downloaded)]
 Any files which are not present in the `data/raw`folder are downloaded.
 
 ```{r}
-#| label: code-download-archives
+#| label: lst-download-archives
 #| eval: false
 # Note that the preceding section will not execute
 # correctly in a Quarto document.
@@ -165,7 +163,7 @@ This allows `read_csv` to determine the type of data in each column.
 The "guessed" column type specification can then inspected using the `spec` function.
 
 ```{r}
-#| label: code-guess-cols
+#| label: lst-guess-cols
 bike_inspect <- map_dfr(
   divvy_downloaded[1],
   ~ archive_read(.) %>%
@@ -184,7 +182,7 @@ The resulting data frame is processed using `distinct()` to eliminate duplicated
 If all headers are identical the resulting data frame will have a single row.
 
 ```{r}
-#| label: code-check-headers
+#| label: lst-check-headers
 bike_headers <- map_dfr(
   divvy_downloaded,
   ~ archive_read(.) %>%
@@ -204,7 +202,7 @@ Passing the full column specification to `read_csv()` ensure that data which doe
 Issues that arise while importing data can be examined using the `problems()` function.
 
 ```{r}
-#| label: code-import-from-zip
+#| label: lst-import-from-zip
 #| cache: true
 bike_rides <- map_dfr(
   divvy_downloaded,
@@ -289,7 +287,7 @@ bike_rides %>%
   )
 ```
 
-@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station.
+@tbl-missing-by-station indicates that \`r sprintf("%.2f", 1322897 \* 100 / nrow(bike_rides))% of all rides are missing data for at least one docking station.
 This represents significant number of data points, and should be checked to determine whether this is an error or there have been systematic changes made.
 
 ```{r}
@@ -503,7 +501,6 @@ This is done using `dplyr::anti_join()` to filter the `bike_rides` dataset remov
 #| label: tbl-remove-operational
 #| tbl-cap: "Sample of cleaned data"
 #| cache: true
-
 bike_rides <- bike_rides %>%
   anti_join(
     unlisted_stations,
@@ -525,14 +522,16 @@ bike_rides %>%
 @tbl-remove-operational shows a sample of the dataset after initial cleaning.
 
 ##### Named stations with rounded coordinates
-Some named stations were found to have rounded location coordinates. Additionally there is some inaccuracy of reported location coordinates.
+
+Some named stations were found to have rounded location coordinates.
+Additionally there is some inaccuracy of reported location coordinates.
 
 To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.
 
 Joining the `active_station` data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.
 
 ```{r}
-#| label: cleaning-truncated-coords
+#| label: lst-cleaning-truncated-coords
 #| lst-cap: "Clean named station coordinates"
 bike_rides <- bike_rides %>%
   left_join(
@@ -573,7 +572,7 @@ bike_rides <- bike_rides %>%
 ```
 
 ```{r}
-#| label: ridesstations-per-coord
+#| label: rides-stations-per-coord
 #| warning: false
 library(ggmap)
 
@@ -609,6 +608,7 @@ chi_map <- get_stamenmap(
   maptype = "toner-lite"
 )
 ```
+
 ```{r, fig.height = 8}
 #| label: fig-location-compare
 #| fig-cap: "Comparison of location data for named and unnamed stations"
@@ -647,8 +647,6 @@ To add analysis calculated columns for the length of ride, the hour the ride sta
 #| label: tbl-add-duration
 #| tbl-cap: "Sample of rides with duration"
 #| cache: true
-
-
 bike_rides <- bike_rides %>%
   mutate(
     ride_int = started_at %--% ended_at,
@@ -665,8 +663,8 @@ bike_rides %>%
 ```
 
 @tbl-add-duration shows a sample of the resulting dataset with added columns.
-
 Minimum and maximum ride times can now be checked for plausibility.
+
 
 ```{r}
 #| label: tbl-ride-min-max
@@ -679,7 +677,6 @@ bike_rides %>%
     Maximum = max(ride_time) / 3600
   )
 ```
-
 Rides with negative duration should not occur, so this needs to be checked and corrected.
 
 ##### Addressing negative ride durations
@@ -705,15 +702,16 @@ bike_rides %>%
   )
 ```
 
-The plot indicates that the precentage rides with negative ride durations is around three times higher in November than the next highest month - September.
+The plot indicates that the percentage rides with negative ride durations is around three times higher in November than the next highest month - September.
 
 ```{r}
 #| label: tbl-days-neg-rides
 #| tbl-cap: "Days in November 2021 with negative ride time"
 bike_rides %>%
-  group_by(month, day) %>%
+  group_by(month, dom = day(started_at)) %>%
   summarise("Percent Negative" = mean(ride_time < 0) * 100) %>%
-  filter(`Percent Negative` > 0)
+  filter(`Percent Negative` > 0) %>%
+  arrange(desc(`Percent Negative`))
 ```
 
 All rides with negative duration in November occurred on the 7th.
@@ -765,7 +763,6 @@ The Cyclistic website indicates that rides of less than 60 seconds have been rem
 Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined \$1200.
 
 ```{r}
-#| label: lst-short-long
 bike_rides <- bike_rides %>%
   filter(ride_time > 60, ride_time < 86400)
 ```
