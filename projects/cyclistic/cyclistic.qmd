@@ -14,6 +14,7 @@ abstract: "An analysis of historical Divvy Bikes ride data to identify differenc
 params:
   start_date: "September 2021"
   end_date: "August 2022"
+  lease: "12345"
 editor:
   markdown:
     wrap: sentence
@@ -108,6 +109,7 @@ library(lubridate)
 library(glue)
 library(archive)
 ```
+
 
 The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
 This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
@@ -240,6 +242,7 @@ With the data loaded from file, the data structure can checked with `glimpse()`.
 
 ```{r}
 #| label: code-check-data-structure
+#| results: markup
 bike_rides %>%
   glimpse()
 ```
@@ -487,7 +490,7 @@ unlisted_stations
 The majority of stations in the table appear to have an operational function.
 Those ending with "- Charging" appear to be associated with testing of new charging stations prior to the company publicly announcing their availability.
 
-#### Removing identified problems
+#### Removing operational and no-return rides
 
 Before proceeding with further manipulation and cleaning, the observations with identified problems should be removed.
 This is done using `dplyr::anti_join()` to filter the `bike_rides` dataset removing items matching those found in the `unlisted_stations` and `no_end_coords` data.frames.
@@ -517,6 +520,116 @@ bike_rides %>%
 
 @tbl-remove-operational shows a sample of the dataset after initial cleaning.
 
+##### Named stations with rounded coordinates
+Some named stations were found to have rounded location coordinates. Additionally there is some inaccuracy of reported location coordinates.
+
+To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.
+
+Joining the `active_station` data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.
+
+```{r}
+#| label: cleaning-truncated-coords
+#| lst-cap: "Clean named station coordinates"
+bike_rides <- bike_rides %>%
+  left_join(
+    active_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  select(-timestamp) %>%
+  left_join(
+    active_stations,
+    by = c("end_station_name" = "station_name"),
+    suffix = c("_start", "_end")
+  ) %>%
+  select(-timestamp) %>%
+  mutate(
+    latitude_end = if_else(
+      is.na(latitude_end),
+      end_lat,
+      latitude_end
+    ),
+    longitude_end = if_else(
+      is.na(longitude_end),
+      end_lng,
+      longitude_end
+    ),
+    latitude_start = if_else(
+      is.na(latitude_start),
+      start_lat,
+      latitude_start
+    ),
+    longitude_start = if_else(
+      is.na(longitude_start),
+      start_lng,
+      longitude_start
+    )
+  ) %>%
+  select(-ends_with("_lng"), -ends_with("_lat"))
+```
+
+```{r}
+#| label: ridesstations-per-coord
+#| warning: false
+library(ggmap)
+
+ss <- bike_rides %>%
+  mutate(
+    missing = if_else(
+      !is.na(start_station_name),
+      "Named",
+      "Unnamed"
+    ),
+    ride_day = date(started_at)
+  ) %>%
+  select(ride_day, missing, latitude_start, longitude_start) %>%
+  group_by(missing, latitude_start, longitude_start) %>%
+  summarise(
+    rides = n(),
+    avg_rides = rides / n_distinct(ride_day),
+    .groups = "drop"
+  )
+
+
+bounding_box <- ss %>%
+  summarise(
+    left = min(longitude_start) - 0.01,
+    bottom = min(latitude_start) - 0.01,
+    right = max(longitude_start) + 0.01,
+    top = max(latitude_start) + 0.01
+  ) %>%
+  unlist()
+
+chi_map <- get_stamenmap(
+  bounding_box,
+  maptype = "toner-lite"
+)
+```
+```{r, fig.height = 8}
+#| warning: false
+#| dev: "svg"
+
+ggmap(chi_map) +
+  geom_point(
+    data = ss,
+    aes(
+      longitude_start,
+      latitude_start,
+      colour = missing
+    ),
+    size = 1,
+    alpha = 0.75
+  ) +
+  facet_grid(cols = vars(missing)) +
+  guides(colour = "none") +
+  scale_colour_manual(values = c("#52854C", "#D16103")) +
+  labs(
+    title = "Named and Unnamed Station locations",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal()
+```
+
 #### Ride duration
 
 ##### Adding Ride Duration, Time and Day of Week
@@ -527,6 +640,7 @@ To add analysis calculated columns for the length of ride, the hour the ride sta
 #| label: tbl-add-duration
 #| tbl-cap: "Sample of rides with duration"
 #| cache: true
+
 
 bike_rides <- bike_rides %>%
   mutate(
@@ -642,30 +756,42 @@ The Cyclistic website indicates that rides of less than 60 seconds have been rem
 Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined \$1200.
 
 ```{r}
+r_pc <- floor(nrow(bike_rides) * 0.0005)
+
+top01 <- bike_rides %>%
+  slice_max(ride_time, n = r_pc) %>%
+  summarise(
+    n = n(),
+    min = min(ride_time),
+    max = max(ride_time),
+    mean = mean(ride_time)
+  )
+
+top01
+```
+
+99.95% of rides are less than 6 hours.
+
+Over the 12 month period `r top01$n` rides exceeded `r paste(top01$min %/% 3600)` duration.
+
+To avoid skewing the analysis I chose to exclude rides over 6 hours.
+
+```{r}
 bike_rides <- bike_rides %>%
-  filter(ride_time >= 60, ride_time <= 21600)
+  filter(ride_time >= 90, ride_time < top01$min)
 
 bike_rides %>%
   group_by(member_casual, rideable_type) %>%
   summarise(
-    median = as.numeric(median(ride_time), units = "secs"),
-    mean = exp(mean(log(ride_time))),
-    sd = exp(sd(log(ride_time))),
-    iqr = IQR(ride_time),
-    outliers = quantile(ride_time, 0.75) + iqr * 1.5
-  )
-
-```
-
-```{r}
-#| label: duratuon-summary
-n3 <- round(nrow(bike_rides) * 0.001, 0)
-
-bike_rides %>%
-  slice_max(ride_time, n = n3) %>%
-  summarise(
-    n = n(),
-    Min = min(ride_time) / 3600,
-    Max = max(ride_time) / 3600
-  )
+    daily_med = as.numeric(median(ride_time)) / 60
+  ) %>%
+  ggplot(
+    aes(
+      rideable_type, daily_med,
+      group = rideable_type,
+      fill = rideable_type
+    )
+  ) +
+  geom_col() +
+  facet_grid(cols = vars(member_casual))
 ```
