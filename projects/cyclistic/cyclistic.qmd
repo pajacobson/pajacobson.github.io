@@ -1,4 +1,5 @@
 ---
+
 title: "Cyclistic Customer Analysis"
 subtitle: "Google Data Analytics Certificate Capstone"
 date: today
@@ -401,6 +402,8 @@ Cyclistic treat bikes unlocked for more than 24 hours as stolen.
 These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.
 
 ```{r}
+#| label: fig-rides-missing-end-coord
+#| fig-cap: "Summary of rides with missing end coordinates"
 #| warning: false
 #| dev: "svg"
 
@@ -413,6 +416,7 @@ no_end_coords %>%
   summarise(triptime = as.numeric(started_at %--% ended_at, units = "days")) %>%
   ggplot(aes(triptime, fill = member_casual)) +
   geom_histogram(binwidth = 1) +
+  scale_y_log10() +
   guides(fill = "none") +
   facet_grid(rows = vars(member_casual)) +
   labs(
@@ -542,6 +546,7 @@ bike_rides <- bike_rides %>%
     suffix = c("_start", "_end")
   ) %>%
   select(-timestamp) %>%
+  distinct(ride_id, .keep_all = TRUE) %>%
   mutate(
     latitude_end = if_else(
       is.na(latitude_end),
@@ -606,6 +611,7 @@ chi_map <- get_stamenmap(
 ```
 ```{r, fig.height = 8}
 #| label: fig-location-compare
+#| fig-cap: "Comparison of location data for named and unnamed stations"
 #| warning: false
 #| dev: "svg"
 
@@ -647,6 +653,7 @@ bike_rides <- bike_rides %>%
   mutate(
     ride_int = started_at %--% ended_at,
     ride_time = as.duration(ride_int),
+    month = month(started_at, label = TRUE),
     hour = hour(started_at),
     day = wday(started_at, label = TRUE),
     .before = start_station_name
@@ -678,6 +685,8 @@ Rides with negative duration should not occur, so this needs to be checked and c
 ##### Addressing negative ride durations
 
 ```{r}
+#| label: fig-negative-ride-duration
+#| fig-cap: "Distribution of negative ride times by month"
 #| dev: "svg"
 bike_rides %>%
   group_by(
@@ -702,8 +711,7 @@ The plot indicates that the precentage rides with negative ride durations is aro
 #| label: tbl-days-neg-rides
 #| tbl-cap: "Days in November 2021 with negative ride time"
 bike_rides %>%
-  filter(month(started_at) == 11) %>%
-  group_by("Day" = day(started_at)) %>%
+  group_by(month, day) %>%
   summarise("Percent Negative" = mean(ride_time < 0) * 100) %>%
   filter(`Percent Negative` > 0)
 ```
@@ -757,42 +765,13 @@ The Cyclistic website indicates that rides of less than 60 seconds have been rem
 Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined \$1200.
 
 ```{r}
-r_pc <- floor(nrow(bike_rides) * 0.0005)
-
-top01 <- bike_rides %>%
-  slice_max(ride_time, n = r_pc) %>%
-  summarise(
-    n = n(),
-    min = min(ride_time),
-    max = max(ride_time),
-    mean = mean(ride_time)
-  )
-
-top01
+#| label: lst-short-long
+bike_rides <- bike_rides %>%
+  filter(ride_time > 60, ride_time < 86400)
 ```
 
-99.95% of rides are less than 6 hours.
-
-Over the 12 month period `r top01$n` rides exceeded `r paste(top01$min %/% 3600)` duration.
-
-To avoid skewing the analysis I chose to exclude rides over 6 hours.
-
 ```{r}
-bike_rides <- bike_rides %>%
-  filter(ride_time >= 90, ride_time < top01$min)
-
 bike_rides %>%
-  group_by(member_casual, rideable_type) %>%
-  summarise(
-    daily_med = as.numeric(median(ride_time)) / 60
-  ) %>%
-  ggplot(
-    aes(
-      rideable_type, daily_med,
-      group = rideable_type,
-      fill = rideable_type
-    )
-  ) +
-  geom_col() +
-  facet_grid(cols = vars(member_casual))
+  filter(ride_time > 43200) %>%
+  summarise(n())
 ```
