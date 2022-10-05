@@ -2,23 +2,25 @@
 title: "Cyclistic Customer Analysis"
 subtitle: "Google Data Analytics Certificate Capstone"
 date: today
-image: images/josh-mccausland-8TfeD3J4VtQ-unsplash.jpg
-title-block-banner: true
+image: images/josh-mccausland-8TfeD3J4VtQ-thumb.png
 format:
   html:
     highlight-style: breezedark
     df-print: kable
     code-fold: true
+    fig-responsive: true
 abstract-title: "Summary"
 abstract: "An analysis of historical Divvy Bikes ride data to identify differences in user cohort behaviour."
 params:
   start_date: "September 2021"
   end_date: "August 2022"
-  lease: "12345"
 editor:
   markdown:
     wrap: sentence
 ---
+:::{.column-body}
+![](images/josh-mccausland-8TfeD3J4VtQ-thumb.png)
+:::
 
 # Background
 
@@ -118,8 +120,8 @@ This allows file names to be generated for months in the range `r params$start_d
 #| lst-cap: "Building file list"
 
 divvy_files <- seq(
-  my(params$start_date),
-  my(params$end_date),
+  my("September 2021"),
+  my("August 2022"),
   by = "months"
 ) %>%
   enframe(
@@ -137,23 +139,19 @@ The folder is checked each time the script is run, and files which are already p
 
 ```{r}
 divvy_downloaded <- glue("data/raw/{divvy_files}")
-to_dl <- divvy_files[!file.exists(divvy_downloaded)]
+files_to_dl <- divvy_files[!file.exists(divvy_downloaded)]
 ```
 
 Any files which are not present in the `data/raw`folder are downloaded.
 
 ```{r}
 #| label: lst-download-archives
-#| eval: false
-# Note that the preceding section will not execute
-# correctly in a Quarto document.
-# A script for the full import process can be found in the
-# Github repository.
 
-if (length(to_dl) > 0) {
-  download.file(
-    glue("https://divvy-tripdata.s3.amazonaws.com/{to_dl}"),
-    glue("data/raw/{to_dl}")
+if (length(files_to_dl) > 0) {
+  purrr::walk2(
+    glue("https://divvy-tripdata.s3.amazonaws.com/{files_to_dl}"),
+    glue("data/raw/{files_to_dl}"),
+    download.file
   )
 }
 ```
@@ -287,8 +285,7 @@ bike_rides %>%
   )
 ```
 
-@tbl-missing-by-station indicates that \`r sprintf("%.2f", 1322897 \* 100 / nrow(bike_rides))% of all rides are missing data for at least one docking station.
-This represents significant number of data points, and should be checked to determine whether this is an error or there have been systematic changes made.
+@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station. This should be checked to determine whether this is due to error or a systematic reason.
 
 ```{r}
 #| label: tbl-coord-range
@@ -320,7 +317,7 @@ bike_rides %>%
   )
 ```
 
-Comparing @tbl-missing-values with @tbl-clipped-start indicates the count of start stations with missing names is the same as those which have rounded coordinates.
+Comparing @tbl-missing-values with @tbl-clipped-start indicates the number of start stations with missing names is the same as those which have rounded coordinates.
 
 ```{r}
 #| label: tbl-clipped-end
@@ -405,13 +402,16 @@ These rides are likely to be bikes that have been reported stolen and not physic
 #| warning: false
 #| dev: "svg"
 
-no_end_coords %>%
+n_e_c <- no_end_coords %>%
   mutate(member_casual = recode(
     member_casual,
     "member" = "Member", "casual" = "Casual"
   )) %>%
   group_by(member_casual) %>%
-  summarise(triptime = as.numeric(started_at %--% ended_at, units = "days")) %>%
+  summarise(triptime = as.numeric(started_at %--% ended_at, units = "days"), n = n())
+
+
+n_e_c %>%
   ggplot(aes(triptime, fill = member_casual)) +
   geom_histogram(binwidth = 1) +
   scale_y_log10() +
@@ -420,13 +420,12 @@ no_end_coords %>%
   labs(
     title = "Rides with missing end coordinates by ride type",
     x = "Trip Duration in Days",
-    y = "Rides"
+    y = "Rides (log10)"
   ) +
   theme_minimal()
 ```
 
-The plot shows that around 5000 of the 5727 rides terminated after more than 24 hours.
-Notably casual rides are the biggest contributor.
+@fig-rides-missing-end-coord shows that the majority of ride with missing end coordinates had a duration of more than 24 hours. Notably casual rides are the biggest contributor.
 
 #### Cyclistic operational rides
 
@@ -645,7 +644,7 @@ To add analysis calculated columns for the length of ride, the hour the ride sta
 
 ```{r}
 #| label: tbl-add-duration
-#| tbl-cap: "Sample of rides with duration"
+#| tbl-cap: "Sample of rides with added duration, month, date and hour"
 #| cache: true
 bike_rides <- bike_rides %>%
   mutate(
@@ -677,7 +676,7 @@ bike_rides %>%
   )
 ```
 
-Rides with negative duration should not occur, so this needs to be checked and corrected.
+Rides with negative duration are now possible, so these need to be checked and cleaned.
 
 ##### Addressing negative ride durations
 
@@ -703,22 +702,19 @@ bike_rides %>%
   )
 ```
 
-The plot indicates that the percentage rides with negative ride durations is around three times higher in November than the next highest month - September.
-
 ```{r}
 #| label: tbl-days-neg-rides
-#| tbl-cap: "Days in November 2021 with negative ride time"
+#| tbl-cap: "Days with negative ride time"
 #| warning: false
 
 bike_rides %>%
-  group_by(month, dom = day(started_at)) %>%
+  group_by(Month = month, Day = day(started_at)) %>%
   summarise("Percent Negative" = mean(ride_time < 0) * 100, .groups = "drop") %>%
   filter(`Percent Negative` > 0) %>%
   slice_max(`Percent Negative`, n = 6)
 ```
 
-All rides with negative duration in November occurred on the 7th.
-
+@fig-negative-ride-duration and @tbl-days-neg-rides show that the percentage rides with negative durations is around three times higher on 7th November than the next highest day - 29th September.
 
 ```{r}
 #| label: tbl-hour-neg-rides
@@ -752,7 +748,8 @@ I recommend that timezone be recorded as part of the timestamp in future to avoi
 For the present analysis I've chosen to correct the negative timestamps between 1.00am and 2.00am and to leave the ambiguous timestamps unaltered.
 
 ```{r}
-#| label: code-remove-dst-negatives
+#| label: lst-remove-dst-negatives
+#| lst-cap: "Correct dst change ride durations"
 bike_rides <- bike_rides %>%
   mutate(ride_time = if_else(
     (ride_time < 0) & (date(started_at) == date("2021-11-07")),
@@ -763,17 +760,24 @@ bike_rides <- bike_rides %>%
 
 ##### Other ride duration issues
 
-The Cyclistic website indicates that rides of less than 60 seconds have been removed from the dataset.
-Cyclistic also state that if rides exceed 24 hours the bike is treated as stolen and the user is fined \$1200.
+The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset. There are still rides present which are less than this minimum and these should be removed.
 
-
-```{r}
-bike_rides <- bike_rides %>%
-  filter(ride_time > 60, ride_time < 86400)
-```
+Cyclistic help pages state that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined $1200.
 
 ```{r}
+#| label: tbl-short-long
+#| tbl-cap: "Trips less than 60 seconds and more than 24 hours"
 bike_rides %>%
-  filter(ride_time > 43200) %>%
-  summarise(n())
+  summarise("< 60 seconds" = sum(ride_time < 60), "> 24 hours" = sum(ride_time > 86000))
 ```
+The significant number of short trips indicate these have not been removed from the data prior to upload.
+These rides can be removed.
+
+```{r}
+#| label: lst-filter-short-long
+#| lst-cap: "Filter short and long "
+bike_rides <- bike_rides %>%
+  filter(ride_time > 60, ride_time < 86000)
+```
+
+
