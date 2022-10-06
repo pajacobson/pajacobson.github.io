@@ -320,8 +320,7 @@ bike_rides %>%
   )
 ```
 
-The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values.
-This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
+The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
 
 It appears that some latitude and longitude values may have been rounded to two significant digits.
 Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
@@ -429,7 +428,7 @@ n_e_c %>%
   guides(fill = "none") +
   facet_grid(rows = vars(user_type)) +
   labs(
-    title = "Rides with missing end coordinates by ride type",
+    title = "Rides with missing end coordinates by user type",
     x = "Trip Duration in Days",
     y = "Rides (log10)"
   ) +
