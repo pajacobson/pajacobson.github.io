@@ -276,11 +276,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Data cleaning and preparation</h1>
 <section id="initial-import" class="level3">
 <h3 data-anchor-id="initial-import">Initial import</h3>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-load-libraries_4276fde1fe9d7a3ae28ef5090cd8f172">
 
 </div>
 <p>The Divvy trip data files have a consistent naming format <code>YYYYMM-divvy-tripdata.zip</code>. This allows file names to be generated for months in the range September 2021 to August 2022.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-file-list_12fbf503f4a5f8254aee4f5ea0b2a4ca">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
@@ -300,7 +300,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>To preserve a local copy of the original data, zip files are downloaded to the <code>data/raw</code> folder. The folder is checked each time the script is run, and files which are already present are removed from the download list.</p>
 <p>Any files which are not present in the <code>data/raw</code>folder are downloaded.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-download-archives_12cc2976cf86a81c9bfe0761e9a736ee">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2" data-caption="download zip archives"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"data/raw/{divvy_files}"</span>)</span>
@@ -316,7 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </details>
 </div>
 <p>The first 1000 rows are read from September 2021 zip file. This allows <code>read_csv</code> to determine the type of data in each column. The “guessed” column type specification can then inspected using the <code>spec</code> function.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-guess-cols_cb902a8c7378cd37373985d661958714">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bike_inspect <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
@@ -349,7 +349,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>The types defined in the column specification appear to be reasonable choices based on naming of the columns.</p>
 <p>To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is processed using <code>distinct()</code> to eliminate duplicated rows. If all headers are identical the resulting data frame will have a single row.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-check-headers_c5ef37b19e1486448b58b8a85e57e066">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bike_headers <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
@@ -419,7 +419,7 @@ $ X13 &lt;chr&gt; "member_casual"</code></pre>
 </details>
 </div>
 <p>To improve readability <code>rideable_type</code> is renamed to <code>bike_type</code> and the <code>_bike</code> suffix removed from the factor levels. <code>member_casual</code> is renamed to <code>user_type</code> and the factor levels given inital caps. An additional column is added which combines the <code>bike_type</code> and <code>user_type</code> categorical variables.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-recode-factors_caae4b5d9ded35954559b46eb757b0b0">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -447,7 +447,7 @@ $ X13 &lt;chr&gt; "member_casual"</code></pre>
 <section id="data-inspection" class="level3">
 <h3 data-anchor-id="data-inspection">Data inspection</h3>
 <p>With the data loaded from file, the data structure can checked with <code>glimpse()</code>.</p>
-<div class="cell" data-tbl-cap="Structure of imported data" data-markup="true">
+<div class="cell" data-tbl-cap="Structure of imported data" data-markup="true" data-hash="cyclistic_cache/html/tbk-check-data-structure_d9eba1dac4c2217bde7794d84b599db4">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bike_rides)</span></code></pre></div>
@@ -472,7 +472,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The output indicates that the data set has 5,883,043 rows, and 14 columns. The <code>start_station_name</code>, <code>start_stattion_id</code>, <code>end_station_name</code> and <code>end_station_id</code> columns appear to have a number of missing values - identified by <code>NA</code>.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-missing-values_3c6cbb33da5ba6afa6e181a04a0c7940">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -561,7 +561,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-missing-values">Table&nbsp;1</a> indicates a significant number of observations are missing end and start station name and id. End station location information is also missing small number of records. All other columns have complete data.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-missing-by-station_0875328ce90873fb758c27a5a845d01c">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -603,7 +603,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for at least one docking station. This should be checked to determine whether this is due to error or a systematic reason.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-coord-range_794f4cecaf013154d49bc146adf2323c">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -648,7 +648,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 <p>The maximum start longitude and latitude values listed in <a href="#tbl-coord-range">Table&nbsp;3</a> are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.</p>
 <p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre area centred on the given grid location.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-clipped-start_3295a935b1fb636d0041c0ca3910e2f6">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -688,7 +688,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>Comparing <a href="#tbl-missing-values">Table&nbsp;1</a> with <a href="#tbl-clipped-start">Table&nbsp;4</a> indicates the number of start stations with missing names is the same as those which have rounded coordinates.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-clipped-end_d934f7d87b587ddc476cfc8df90a4f5d">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -731,7 +731,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>This suggests that there is a systemic reason for the missing data, rather than error. It seems likely the location data has been anonymised to protect riders privacy. This needs to be verified with Cyclistics data collection team.</p>
 <p>The ride duration and other information appear plausible and the lack of location data does not impact analysis of this data. Records with missing location information will be retained but filtered for any analysis which depends on accurate location.</p>
 <p>While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named. These need to be checked during cleaning.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-date-ranges_72a12a7a0db6fe67a17ba1bff8c0aa65">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -767,7 +767,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-date-ranges">Table&nbsp;6</a> indicates the dataset includes rides which finished after August 2022.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-14_56a2c4a952758bbec6cbe90de3d2ac36">
 
 </div>
 <p>In total 115 rides are active at midnight on 31 August 2022. As these overnight rides cause issues with data visualisation and other analysis, I chose to remove rides which finished after mid</p>
@@ -777,7 +777,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <section id="missing-end-station-coordinates" class="level4">
 <h4 data-anchor-id="missing-end-station-coordinates">Missing end station coordinates</h4>
 <p>The end stations with missing name and coordinates are addressed first.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-no-end-coords_84811c48ec5dd75491d5e42ae11930f9">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -893,7 +893,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The preview of these rides contains several rides which extend for more than a day. Cyclistic treat bikes unlocked for more than 24 hours as stolen. These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/fig-rides-missing-end-coord_64fc31fa9318103d7767c9ea7b168e77">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>n_e_c <span class="ot">&lt;-</span> no_end_coords <span class="sc">%&gt;%</span></span>
@@ -908,7 +908,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(user_type)) <span class="sc">+</span></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with missing end coordinates by ride type"</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Rides with missing end coordinates by user type"</span>,</span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Trip Duration in Days"</span>,</span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rides (log10)"</span></span>
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
@@ -929,7 +929,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <h4 data-anchor-id="cyclistic-operational-rides">Cyclistic operational rides</h4>
 <p>A list of stations that were <em>In-Service</em> between September 2021 and August 2022 was extracted from a dataset maintained by City of Chicago. The dataset for the period of interest contains over 35 million rows recording the status of each docking station at hour intervals.</p>
 <p>Due to the size of the dataset the processed listing of stations is used in this analysis.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-stations-in-use_00a59d4e1d8f503d34d80ba1e2701bef">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>active_stations <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
@@ -946,6 +946,12 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <div id="tbl-stations-in-use">
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
+<colgroup>
+<col style="width: 23%">
+<col style="width: 53%">
+<col style="width: 10%">
+<col style="width: 11%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">timestamp</th>
@@ -957,39 +963,39 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Racine Ave &amp; 35th St</td>
-<td style="text-align: right;">41.83070</td>
-<td style="text-align: right;">-87.65598</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-10-05 17:55:35</td>
-<td style="text-align: left;">Artesian Ave &amp; 55th St</td>
-<td style="text-align: right;">41.79401</td>
-<td style="text-align: right;">-87.68581</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-05-17 20:35:40</td>
-<td style="text-align: left;">Lowe Ave &amp; 119th St</td>
-<td style="text-align: right;">41.67771</td>
-<td style="text-align: right;">-87.63871</td>
+<td style="text-align: left;">Racine Ave &amp; Garfield Blvd</td>
+<td style="text-align: right;">41.79423</td>
+<td style="text-align: right;">-87.65507</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Loomis St &amp; Archer Ave</td>
-<td style="text-align: right;">41.84163</td>
-<td style="text-align: right;">-87.65744</td>
+<td style="text-align: left;">South Shore Dr &amp; 74th St</td>
+<td style="text-align: right;">41.76219</td>
+<td style="text-align: right;">-87.55927</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2022-04-21 19:35:05</td>
-<td style="text-align: left;">Troy St &amp; Jackson Blvd</td>
-<td style="text-align: right;">41.87750</td>
-<td style="text-align: right;">-87.70485</td>
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Central Park Ave &amp; Bloomingdale Ave</td>
+<td style="text-align: right;">41.91417</td>
+<td style="text-align: right;">-87.71676</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">2022-07-07 14:15:27</td>
+<td style="text-align: left;">Public Rack - South Shore Dr &amp; 71st St</td>
+<td style="text-align: right;">41.76621</td>
+<td style="text-align: right;">-87.56279</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Marquette Ave &amp; 89th St</td>
-<td style="text-align: right;">41.73367</td>
-<td style="text-align: right;">-87.55834</td>
+<td style="text-align: left;">Clarendon Ave &amp; Gordon Ter</td>
+<td style="text-align: right;">41.95787</td>
+<td style="text-align: right;">-87.64951</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2022-07-07 14:15:27</td>
+<td style="text-align: left;">Public Rack - Christiana Ave &amp; Bryn Mawr Ave</td>
+<td style="text-align: right;">41.98284</td>
+<td style="text-align: right;">-87.71233</td>
 </tr>
 </tbody>
 </table>
@@ -999,7 +1005,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 <p>A random sample of stations from the dataset is shown in <a href="#tbl-stations-in-use">Table&nbsp;8</a>. The timestamp indicates the first time a station appears as <em>In-Service</em> in the original dataset.</p>
 <p>The active stations dataset is used to identify stations that were not listed as publicly available.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-unlisted-stations_885697b86301e2ef929fb21e42461a78">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>unlisted_start <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1167,15 +1173,15 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <colgroup>
 <col style="width: 7%">
 <col style="width: 4%">
-<col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 16%">
 <col style="width: 7%">
 <col style="width: 11%">
 <col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 4%">
-<col style="width: 4%">
+<col style="width: 3%">
 <col style="width: 4%">
 <col style="width: 4%">
 <col style="width: 7%">
@@ -1200,100 +1206,100 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">BD478C6CAB01A03D</td>
+<td style="text-align: left;">946A479800D155F7</td>
 <td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2021-10-01 07:44:03</td>
-<td style="text-align: left;">2021-10-01 07:51:30</td>
-<td style="text-align: left;">MLK Jr Dr &amp; 29th St</td>
-<td style="text-align: left;">TA1307000139</td>
-<td style="text-align: left;">State St &amp; 33rd St</td>
-<td style="text-align: left;">13216</td>
-<td style="text-align: right;">41.84205</td>
-<td style="text-align: right;">-87.61700</td>
-<td style="text-align: right;">41.83473</td>
-<td style="text-align: right;">-87.62581</td>
+<td style="text-align: left;">2022-01-18 19:19:23</td>
+<td style="text-align: left;">2022-01-18 19:29:47</td>
+<td style="text-align: left;">Canal St &amp; Madison St</td>
+<td style="text-align: left;">13341</td>
+<td style="text-align: left;">Larrabee St &amp; Oak St</td>
+<td style="text-align: left;">KA1504000116</td>
+<td style="text-align: right;">41.88209</td>
+<td style="text-align: right;">-87.63983</td>
+<td style="text-align: right;">41.90022</td>
+<td style="text-align: right;">-87.64299</td>
 <td style="text-align: left;">Member</td>
 <td style="text-align: left;">Member-Classic</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">0A98DF85F61931F6</td>
+<td style="text-align: left;">3AF32B1CED5DCCF5</td>
+<td style="text-align: left;">Electric</td>
+<td style="text-align: left;">2022-02-08 09:25:50</td>
+<td style="text-align: left;">2022-02-08 09:40:04</td>
+<td style="text-align: left;">Damen Ave &amp; Thomas St (Augusta Blvd)</td>
+<td style="text-align: left;">TA1307000070</td>
+<td style="text-align: left;">Morgan St &amp; Polk St</td>
+<td style="text-align: left;">TA1307000130</td>
+<td style="text-align: right;">41.90137</td>
+<td style="text-align: right;">-87.67739</td>
+<td style="text-align: right;">41.87174</td>
+<td style="text-align: right;">-87.65103</td>
+<td style="text-align: left;">Member</td>
+<td style="text-align: left;">Member-Electric</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">A7D073E24485FCF3</td>
+<td style="text-align: left;">Electric</td>
+<td style="text-align: left;">2022-08-31 13:52:32</td>
+<td style="text-align: left;">2022-08-31 13:59:30</td>
+<td style="text-align: left;">St Louis Ave &amp; Norman Bobbins Ave</td>
+<td style="text-align: left;">385</td>
+<td style="text-align: left;">Kedzie Ave &amp; 48th Pl</td>
+<td style="text-align: left;">382</td>
+<td style="text-align: right;">41.79000</td>
+<td style="text-align: right;">-87.71000</td>
+<td style="text-align: right;">41.80000</td>
+<td style="text-align: right;">-87.70000</td>
+<td style="text-align: left;">Casual</td>
+<td style="text-align: left;">Casual-Electric</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5E60C446A41C51AC</td>
 <td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2021-10-04 06:58:07</td>
-<td style="text-align: left;">2021-10-04 07:04:41</td>
-<td style="text-align: left;">Dearborn St &amp; Erie St</td>
-<td style="text-align: left;">13045</td>
-<td style="text-align: left;">Orleans St &amp; Hubbard St</td>
-<td style="text-align: left;">636</td>
-<td style="text-align: right;">41.89399</td>
-<td style="text-align: right;">-87.62932</td>
-<td style="text-align: right;">41.89003</td>
-<td style="text-align: right;">-87.63662</td>
+<td style="text-align: left;">2022-08-02 12:41:01</td>
+<td style="text-align: left;">2022-08-02 12:43:38</td>
+<td style="text-align: left;">Sheffield Ave &amp; Webster Ave</td>
+<td style="text-align: left;">TA1309000033</td>
+<td style="text-align: left;">Clifton Ave &amp; Armitage Ave</td>
+<td style="text-align: left;">TA1307000163</td>
+<td style="text-align: right;">41.92154</td>
+<td style="text-align: right;">-87.65382</td>
+<td style="text-align: right;">41.91822</td>
+<td style="text-align: right;">-87.65694</td>
 <td style="text-align: left;">Member</td>
 <td style="text-align: left;">Member-Classic</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">304DCA44FB0C8E8A</td>
-<td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2021-10-01 18:18:23</td>
-<td style="text-align: left;">2021-10-01 18:30:47</td>
-<td style="text-align: left;">Sheffield Ave &amp; Willow St</td>
-<td style="text-align: left;">TA1306000032</td>
-<td style="text-align: left;">Wells St &amp; Evergreen Ave</td>
-<td style="text-align: left;">TA1308000049</td>
-<td style="text-align: right;">41.91369</td>
-<td style="text-align: right;">-87.65286</td>
-<td style="text-align: right;">41.90672</td>
-<td style="text-align: right;">-87.63483</td>
+<td style="text-align: left;">D867BD5AD507FDCF</td>
+<td style="text-align: left;">Electric</td>
+<td style="text-align: left;">2022-08-03 18:01:41</td>
+<td style="text-align: left;">2022-08-03 18:08:39</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">41.93000</td>
+<td style="text-align: right;">-87.66000</td>
+<td style="text-align: right;">41.93000</td>
+<td style="text-align: right;">-87.66000</td>
 <td style="text-align: left;">Casual</td>
-<td style="text-align: left;">Casual-Classic</td>
+<td style="text-align: left;">Casual-Electric</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">0D9F7187358CBAB7</td>
+<td style="text-align: left;">FC5A8C3003CF0470</td>
 <td style="text-align: left;">Electric</td>
-<td style="text-align: left;">2022-04-12 10:29:09</td>
-<td style="text-align: left;">2022-04-12 10:32:26</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: right;">41.79000</td>
-<td style="text-align: right;">-87.59000</td>
-<td style="text-align: right;">41.79000</td>
-<td style="text-align: right;">-87.60000</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Electric</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">338E4941BF8675CA</td>
-<td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2021-11-17 15:50:57</td>
-<td style="text-align: left;">2021-11-17 15:56:50</td>
-<td style="text-align: left;">Lincoln Ave &amp; Diversey Pkwy</td>
-<td style="text-align: left;">TA1307000064</td>
-<td style="text-align: left;">Clark St &amp; Wellington Ave</td>
-<td style="text-align: left;">TA1307000136</td>
-<td style="text-align: right;">41.93223</td>
-<td style="text-align: right;">-87.65862</td>
-<td style="text-align: right;">41.93650</td>
-<td style="text-align: right;">-87.64754</td>
+<td style="text-align: left;">2022-07-05 18:25:17</td>
+<td style="text-align: left;">2022-07-05 18:38:54</td>
+<td style="text-align: left;">Ashland Ave &amp; Blackhawk St</td>
+<td style="text-align: left;">13224</td>
+<td style="text-align: left;">Damen Ave &amp; Wellington Ave</td>
+<td style="text-align: left;">13268</td>
+<td style="text-align: right;">41.90704</td>
+<td style="text-align: right;">-87.66731</td>
+<td style="text-align: right;">41.93588</td>
+<td style="text-align: right;">-87.67842</td>
 <td style="text-align: left;">Casual</td>
-<td style="text-align: left;">Casual-Classic</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">21C8E426A32464CC</td>
-<td style="text-align: left;">Electric</td>
-<td style="text-align: left;">2022-08-27 09:16:12</td>
-<td style="text-align: left;">2022-08-27 09:38:45</td>
-<td style="text-align: left;">Dearborn St &amp; Monroe St</td>
-<td style="text-align: left;">TA1305000006</td>
-<td style="text-align: left;">Paulina St &amp; Flournoy St</td>
-<td style="text-align: left;">KA1504000104</td>
-<td style="text-align: right;">41.88106</td>
-<td style="text-align: right;">-87.62956</td>
-<td style="text-align: right;">41.87295</td>
-<td style="text-align: right;">-87.66913</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Electric</td>
+<td style="text-align: left;">Casual-Electric</td>
 </tr>
 </tbody>
 </table>
@@ -1307,7 +1313,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>Some named stations were found to have rounded location coordinates. Additionally there is some inaccuracy of reported location coordinates.</p>
 <p>To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.</p>
 <p>Joining the <code>active_station</code> data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-cleaning-truncated-coords_7345ff0a74c7cb0fc6c7d4cb00b710c1">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22" data-caption="Clean named station coordinates"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1348,7 +1354,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_lng"</span>), <span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_lat"</span>))</span></code></pre></div>
 </details>
 </div>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-stations-per-coord_018424b17c32be06838883d67c58a2eb">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23" data-caption="Exctract bounding coordinates"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1384,7 +1390,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </details>
 </div>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/fig-location-compare_e1435f8bf0e4e6376c33c62ac2371e47">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggmap</span>(chi_map) <span class="sc">+</span></span>
@@ -1450,7 +1456,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <col style="width: 3%">
 <col style="width: 7%">
 <col style="width: 7%">
-<col style="width: 7%">
+<col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 1%">
 <col style="width: 1%">
@@ -1465,7 +1471,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <col style="width: 5%">
 <col style="width: 2%">
 <col style="width: 4%">
-<col style="width: 5%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1493,129 +1499,129 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2021-10-09 19:32:46</td>
-<td style="text-align: left;">2021-10-09 19:52:46</td>
-<td style="text-align: right;">1200s (~20 minutes)</td>
+<td style="text-align: left;">2021-10-23 09:47:03</td>
+<td style="text-align: left;">2021-10-23 09:56:46</td>
+<td style="text-align: right;">583s (~9.72 minutes)</td>
 <td style="text-align: left;">2021-10-01</td>
-<td style="text-align: right;">19</td>
+<td style="text-align: right;">9</td>
 <td style="text-align: left;">Sat</td>
-<td style="text-align: left;">Green St &amp; Madison St</td>
-<td style="text-align: left;">TA1307000120</td>
-<td style="text-align: left;">Dearborn Pkwy &amp; Delaware Pl</td>
-<td style="text-align: left;">TA1307000128</td>
+<td style="text-align: left;">Chicago Ave &amp; Washington St</td>
+<td style="text-align: left;">E002</td>
+<td style="text-align: left;">Ridge Blvd &amp; Howard St</td>
+<td style="text-align: left;">514</td>
+<td style="text-align: left;">Member</td>
+<td style="text-align: left;">Member-Classic</td>
+<td style="text-align: right;">597</td>
+<td style="text-align: right;">42.03256</td>
+<td style="text-align: right;">-87.67910</td>
+<td style="text-align: right;">514</td>
+<td style="text-align: right;">42.01928</td>
+<td style="text-align: right;">-87.68452</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Docked</td>
+<td style="text-align: left;">2021-09-14 14:01:37</td>
+<td style="text-align: left;">2021-09-14 14:33:21</td>
+<td style="text-align: right;">1904s (~31.73 minutes)</td>
+<td style="text-align: left;">2021-09-01</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Tue</td>
+<td style="text-align: left;">Michigan Ave &amp; Lake St</td>
+<td style="text-align: left;">TA1305000011</td>
+<td style="text-align: left;">Streeter Dr &amp; Grand Ave</td>
+<td style="text-align: left;">13022</td>
+<td style="text-align: left;">Casual</td>
+<td style="text-align: left;">Casual-Docked</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">41.88602</td>
+<td style="text-align: right;">-87.62412</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">41.89228</td>
+<td style="text-align: right;">-87.61204</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Classic</td>
+<td style="text-align: left;">2022-04-06 06:52:35</td>
+<td style="text-align: left;">2022-04-06 06:57:38</td>
+<td style="text-align: right;">303s (~5.05 minutes)</td>
+<td style="text-align: left;">2022-04-01</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Loomis St &amp; Lexington St</td>
+<td style="text-align: left;">13332</td>
+<td style="text-align: left;">Halsted St &amp; Roosevelt Rd</td>
+<td style="text-align: left;">TA1305000017</td>
+<td style="text-align: left;">Member</td>
+<td style="text-align: left;">Member-Classic</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">41.87219</td>
+<td style="text-align: right;">-87.66150</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">41.86732</td>
+<td style="text-align: right;">-87.64862</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Electric</td>
+<td style="text-align: left;">2022-07-24 17:56:52</td>
+<td style="text-align: left;">2022-07-24 18:02:15</td>
+<td style="text-align: right;">323s (~5.38 minutes)</td>
+<td style="text-align: left;">2022-07-01</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Burling St &amp; Diversey Pkwy</td>
+<td style="text-align: left;">TA1309000036</td>
+<td style="text-align: left;">Member</td>
+<td style="text-align: left;">Member-Electric</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">41.93000</td>
+<td style="text-align: right;">-87.64000</td>
+<td style="text-align: right;">332</td>
+<td style="text-align: right;">41.93314</td>
+<td style="text-align: right;">-87.64776</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Electric</td>
+<td style="text-align: left;">2021-10-16 07:01:17</td>
+<td style="text-align: left;">2021-10-16 07:10:45</td>
+<td style="text-align: right;">568s (~9.47 minutes)</td>
+<td style="text-align: left;">2021-10-01</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Wells St &amp; Elm St</td>
+<td style="text-align: left;">KA1504000135</td>
+<td style="text-align: left;">New St &amp; Illinois St</td>
+<td style="text-align: left;">TA1306000013</td>
+<td style="text-align: left;">Member</td>
+<td style="text-align: left;">Member-Electric</td>
+<td style="text-align: right;">182</td>
+<td style="text-align: right;">41.90322</td>
+<td style="text-align: right;">-87.63432</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">41.89085</td>
+<td style="text-align: right;">-87.61862</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Classic</td>
+<td style="text-align: left;">2021-09-04 23:28:36</td>
+<td style="text-align: left;">2021-09-04 23:39:39</td>
+<td style="text-align: right;">663s (~11.05 minutes)</td>
+<td style="text-align: left;">2021-09-01</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Wilton Ave &amp; Diversey Pkwy</td>
+<td style="text-align: left;">TA1306000014</td>
+<td style="text-align: left;">Sheffield Ave &amp; Waveland Ave</td>
+<td style="text-align: left;">TA1307000126</td>
 <td style="text-align: left;">Casual</td>
 <td style="text-align: left;">Casual-Classic</td>
-<td style="text-align: right;">198</td>
-<td style="text-align: right;">41.88189</td>
-<td style="text-align: right;">-87.64879</td>
-<td style="text-align: right;">140</td>
-<td style="text-align: right;">41.89897</td>
-<td style="text-align: right;">-87.62991</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2022-05-25 13:45:35</td>
-<td style="text-align: left;">2022-05-25 13:49:49</td>
-<td style="text-align: right;">254s (~4.23 minutes)</td>
-<td style="text-align: left;">2022-05-01</td>
 <td style="text-align: right;">13</td>
-<td style="text-align: left;">Wed</td>
-<td style="text-align: left;">Clark St &amp; Winnemac Ave</td>
-<td style="text-align: left;">TA1309000035</td>
-<td style="text-align: left;">Ravenswood Ave &amp; Lawrence Ave</td>
-<td style="text-align: left;">TA1309000066</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Classic</td>
-<td style="text-align: right;">325</td>
-<td style="text-align: right;">41.97335</td>
-<td style="text-align: right;">-87.66786</td>
-<td style="text-align: right;">344</td>
-<td style="text-align: right;">41.96909</td>
-<td style="text-align: right;">-87.67424</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Classic</td>
-<td style="text-align: left;">2022-08-21 09:52:13</td>
-<td style="text-align: left;">2022-08-21 09:58:31</td>
-<td style="text-align: right;">378s (~6.3 minutes)</td>
-<td style="text-align: left;">2022-08-01</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: left;">Sun</td>
-<td style="text-align: left;">Franklin St &amp; Chicago Ave</td>
-<td style="text-align: left;">13017</td>
-<td style="text-align: left;">Clark St &amp; Schiller St</td>
-<td style="text-align: left;">TA1309000024</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Classic</td>
-<td style="text-align: right;">31</td>
-<td style="text-align: right;">41.89675</td>
-<td style="text-align: right;">-87.63567</td>
-<td style="text-align: right;">301</td>
-<td style="text-align: right;">41.90799</td>
-<td style="text-align: right;">-87.63150</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Electric</td>
-<td style="text-align: left;">2021-12-17 17:38:46</td>
-<td style="text-align: left;">2021-12-17 17:53:39</td>
-<td style="text-align: right;">893s (~14.88 minutes)</td>
-<td style="text-align: left;">2021-12-01</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: left;">Fri</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Electric</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">41.72000</td>
-<td style="text-align: right;">-87.57000</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">41.72000</td>
-<td style="text-align: right;">-87.60000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Electric</td>
-<td style="text-align: left;">2022-08-13 18:50:29</td>
-<td style="text-align: left;">2022-08-13 18:50:49</td>
-<td style="text-align: right;">20s</td>
-<td style="text-align: left;">2022-08-01</td>
-<td style="text-align: right;">18</td>
-<td style="text-align: left;">Sat</td>
-<td style="text-align: left;">Clark St &amp; Elmdale Ave</td>
-<td style="text-align: left;">KA1504000148</td>
-<td style="text-align: left;">Clark St &amp; Elmdale Ave</td>
-<td style="text-align: left;">KA1504000148</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Electric</td>
-<td style="text-align: right;">457</td>
-<td style="text-align: right;">41.99086</td>
-<td style="text-align: right;">-87.66972</td>
-<td style="text-align: right;">457</td>
-<td style="text-align: right;">41.99086</td>
-<td style="text-align: right;">-87.66972</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Electric</td>
-<td style="text-align: left;">2022-08-13 16:23:12</td>
-<td style="text-align: left;">2022-08-13 16:26:58</td>
-<td style="text-align: right;">226s (~3.77 minutes)</td>
-<td style="text-align: left;">2022-08-01</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: left;">Sat</td>
-<td style="text-align: left;">Southport Ave &amp; Roscoe St</td>
-<td style="text-align: left;">13071</td>
-<td style="text-align: left;">Ashland Ave &amp; Grace St</td>
-<td style="text-align: left;">13319</td>
-<td style="text-align: left;">Member</td>
-<td style="text-align: left;">Member-Electric</td>
-<td style="text-align: right;">229</td>
-<td style="text-align: right;">41.94374</td>
-<td style="text-align: right;">-87.66402</td>
-<td style="text-align: right;">347</td>
-<td style="text-align: right;">41.95069</td>
-<td style="text-align: right;">-87.66870</td>
+<td style="text-align: right;">41.93242</td>
+<td style="text-align: right;">-87.65270</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">41.94940</td>
+<td style="text-align: right;">-87.65453</td>
 </tr>
 </tbody>
 </table>
@@ -1659,7 +1665,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </section>
 <section id="addressing-negative-ride-durations" class="level5">
 <h5 data-anchor-id="addressing-negative-ride-durations">Addressing negative ride durations</h5>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/fig-negative-ride-duration_54f44e937a7dadf72220d1a00ab3f3eb">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1685,7 +1691,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-days-neg-rides_57cad0036163a470cb779c0ad46a62bb">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1744,7 +1750,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#fig-negative-ride-duration">Figure&nbsp;3</a> and <a href="#tbl-days-neg-rides">Table&nbsp;13</a> show that the percentage rides with negative durations is around three times higher on 7th November than the next highest day - 29th September.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-hour-neg-rides_f4555a4deb7f40f654c4438c76c0773d">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1788,7 +1794,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>The negative duration of rides which start and end between 1.00am and 2.00am can be resolved by adding 60 minutes. However the ambiguity of the rides which have one end point in this time range remains.</p>
 <p>I recommend that timezone be recorded as part of the timestamp in future to avoid these issues.</p>
 <p>For the present analysis I’ve chosen to correct the negative timestamps between 1.00am and 2.00am and to leave the ambiguous timestamps unaltered.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-remove-dst-negatives_7a2a248769f9e4b8a9d65eb3b33d9186">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30" data-caption="Correct dst change ride durations"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1804,7 +1810,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <h5 data-anchor-id="other-ride-duration-issues">Other ride duration issues</h5>
 <p>The <a href="https://ride.divvybikes.com/system-data">Cyclistic website</a> indicates that rides of less than 60 seconds have been removed from the dataset. Cyclistic help pages note that if rides <a href="https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen">exceed 24 hours</a> the bike is treated as stolen and the user can be fined $1200.</p>
 <p>These types of rides should not be present.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/tbl-short-long_ae67c042c0775e986331cbbb24ad2000">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1836,7 +1842,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The significant number of short trips indicate these have not been removed from the data prior to upload. These short rides and rides which can be classified as stolen are removed.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/lst-filter-short-long_7e7294c030353456990304189d83ac75">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32" data-caption="Filter short and long "><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1844,13 +1850,13 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </details>
 </div>
 <p>After cleaning the processed dataset is saved as a <code>RDS</code> file.</p>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-31_69cfa032a793557b330d6c9f443afa6c">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bike_rides, <span class="st">"data/processed/bike_rides.rds"</span>, <span class="at">compress =</span> <span class="st">"gz"</span>)</span></code></pre></div>
 </details>
 </div>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-32_24565effec5ddb72207c967c9e4172a5">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/processed/bike_rides.rds"</span>)</span></code></pre></div>
@@ -1861,7 +1867,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </section>
 <section id="analysis" class="level2">
 <h2 data-anchor-id="analysis">Analysis</h2>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/fig-rides-bike-user_e2e06ab9f40c36c6057444570209f6ab">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>basic <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1894,7 +1900,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-hash="cyclistic_cache/html/fig-duration-bike-user_9b65fddbf334344c9361f3f51b3a6c44">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>basic <span class="sc">%&gt;%</span></span>
