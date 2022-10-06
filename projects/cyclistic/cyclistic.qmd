@@ -14,6 +14,7 @@ abstract: "An analysis of historical Divvy Bikes ride data to identify differenc
 params:
   start_date: "September 2021"
   end_date: "August 2022"
+  zip_dir: "data/raw"
 editor:
   markdown:
     wrap: sentence
@@ -110,6 +111,7 @@ library(tidyverse)
 library(lubridate)
 library(glue)
 library(archive)
+library(ggmap)
 ```
 
 The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
@@ -137,15 +139,13 @@ divvy_files <- seq(
 To preserve a local copy of the original data, zip files are downloaded to the `data/raw` folder.
 The folder is checked each time the script is run, and files which are already present are removed from the download list.
 
-```{r}
-divvy_downloaded <- glue("data/raw/{divvy_files}")
-files_to_dl <- divvy_files[!file.exists(divvy_downloaded)]
-```
-
 Any files which are not present in the `data/raw`folder are downloaded.
 
 ```{r}
 #| label: lst-download-archives
+#| lst-cap: "download zip archives"
+file_list <- glue("data/raw/{divvy_files}")
+files_to_dl <- divvy_files[!file.exists(file_list)]
 
 if (length(files_to_dl) > 0) {
   purrr::walk2(
@@ -163,7 +163,7 @@ The "guessed" column type specification can then inspected using the `spec` func
 ```{r}
 #| label: lst-guess-cols
 bike_inspect <- map_dfr(
-  divvy_downloaded[1],
+  file_list[1],
   ~ archive_read(.) %>%
     read_csv(
       n_max = 1000,
@@ -182,7 +182,7 @@ If all headers are identical the resulting data frame will have a single row.
 ```{r}
 #| label: lst-check-headers
 bike_headers <- map_dfr(
-  divvy_downloaded,
+  file_list,
   ~ archive_read(.) %>%
     read_csv(
       n_max = 1,
@@ -192,7 +192,7 @@ bike_headers <- map_dfr(
 ) %>%
   distinct()
 
-str(bike_headers)
+glimpse(bike_headers)
 ```
 
 After verifying the detected formats, and checking column naming is consistent across all files, the full dataset can be imported.
@@ -203,7 +203,7 @@ Issues that arise while importing data can be examined using the `problems()` fu
 #| label: lst-import-from-zip
 #| cache: true
 bike_rides <- map_dfr(
-  divvy_downloaded,
+  file_list,
   ~ archive_read(.) %>%
     read_csv(
       col_types = cols(
@@ -232,22 +232,43 @@ bike_rides <- map_dfr(
     )
 )
 ```
+To improve readability `rideable_type` is renamed to `bike_type` and the `_bike` suffix removed from the factor levels. `member_casual` is renamed to `user_type` and the factor levels given inital caps. An additional column is added which combines the `bike_type` and `user_type` categorical variables.
+
+```{r}
+#| label: lst-recode-factors
+bike_rides <- bike_rides %>%
+  mutate(
+    rideable_type = recode(
+      rideable_type,
+      classic_bike = "Classic",
+      docked_bike = "Docked",
+      electric_bike = "Electric"
+    ),
+    member_casual = recode(
+      member_casual,
+      member = "Member",
+      casual = "Casual"
+    ),
+    user_bike = forcats::fct_cross(member_casual, rideable_type, sep = "-")
+  ) %>%
+  rename(
+    bike_type = rideable_type,
+    user_type = member_casual
+  )
+```
 
 ### Data inspection
 
 With the data loaded from file, the data structure can checked with `glimpse()`.
 
 ```{r}
-#| label: code-check-data-structure
-#| results: markup
-bike_rides %>%
-  glimpse()
+#| label: tbk-check-data-structure
+#| tbl-cap: "Structure of imported data"
+#| markup: true
+glimpse(bike_rides)
 ```
 
-The output indicates that the data set has `r nrow(bike_rides)` rows, and `r ncol(bike_rides)` columns.
-The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing values - identified by `NA`.
-
-The extent of the missing information can be assessed by counting the number of `NA` values in each column.
+The output indicates that the data set has `r format(nrow(bike_rides), big.mark = ",")` rows, and `r ncol(bike_rides)` columns.  The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing values - identified by `NA`.
 
 ```{r}
 #| label: tbl-missing-values
@@ -265,7 +286,7 @@ bike_rides %>%
   )
 ```
 
-@tbl-missing-values indicates a significant number of records are missing end and start station name and id.
+@tbl-missing-values indicates a significant number of observations are missing end and start station name and id.
 End station location information is also missing small number of records.
 All other columns have complete data.
 
@@ -345,6 +366,7 @@ These need to be checked during cleaning.
 ```{r}
 #| label: tbl-date-ranges
 #| tbl-cap: "Ride start and end date ranges"
+
 bike_rides %>%
   summarise(
     start_range = range(started_at),
@@ -357,19 +379,12 @@ bike_rides %>%
 ```{r}
 #| echo: false
 eop_rides_00 <- bike_rides %>%
-  filter(ended_at > ymd_hms("20220901 00:00:00")) %>%
-  summarise(n = n()) %>%
-  pull(n)
-
-eop_rides_12 <- bike_rides %>%
-  filter(ended_at > ymd_hms("20220901 09:00:00")) %>%
-  summarise(n = n()) %>%
-  pull(n)
+  filter(ended_at > ymd_hms("20220901 00:00:00", tz = "America/Chicago")) %>%
+  summarise(ride_id)
 ```
 
-In total `r eop_rides_00` rides are active at midnight on 31 August 2022.
-Of these, `r eop_rides_12` rides are still active at 9.00am on 1 September 2022.
-As these overnight rides are excluded from the start of the data set, I've opted to retain rides which completed prior to 9.00am to ensure this group of riders is not under represented.
+In total `r nrow(eop_rides_00)` rides are active at midnight on 31 August 2022.
+As these overnight rides cause issues with data visualisation and other analysis, I chose to remove rides which finished after mid
 
 ### Data Cleaning
 
@@ -403,20 +418,16 @@ These rides are likely to be bikes that have been reported stolen and not physic
 #| dev: "svg"
 
 n_e_c <- no_end_coords %>%
-  mutate(member_casual = recode(
-    member_casual,
-    "member" = "Member", "casual" = "Casual"
-  )) %>%
-  group_by(member_casual) %>%
+  group_by(user_type) %>%
   summarise(triptime = as.numeric(started_at %--% ended_at, units = "days"), n = n())
 
 
 n_e_c %>%
-  ggplot(aes(triptime, fill = member_casual)) +
+  ggplot(aes(triptime, fill = user_type)) +
   geom_histogram(binwidth = 1) +
   scale_y_log10() +
   guides(fill = "none") +
-  facet_grid(rows = vars(member_casual)) +
+  facet_grid(rows = vars(user_type)) +
   labs(
     title = "Rides with missing end coordinates by ride type",
     x = "Trip Duration in Days",
@@ -512,6 +523,10 @@ bike_rides <- bike_rides %>%
   anti_join(
     no_end_coords,
     by = "ride_id"
+  ) %>%
+  anti_join(
+    eop_rides_00,
+    by = "ride_id"
   )
 
 bike_rides %>%
@@ -571,10 +586,9 @@ bike_rides <- bike_rides %>%
 ```
 
 ```{r}
-#| label: rides-stations-per-coord
+#| label: lst-stations-per-coord
+#| lst-cap: "Exctract bounding coordinates"
 #| warning: false
-library(ggmap)
-
 ss <- bike_rides %>%
   mutate(
     missing = if_else(
@@ -637,7 +651,6 @@ ggmap(chi_map) +
 ```
 
 #### Ride duration
-
 ##### Adding Ride Duration, Time and Day of Week
 
 To add analysis calculated columns for the length of ride, the hour the ride started and the day of week are added to the dataset.
@@ -650,7 +663,7 @@ bike_rides <- bike_rides %>%
   mutate(
     ride_int = started_at %--% ended_at,
     ride_time = as.duration(ride_int),
-    month = month(started_at, label = TRUE),
+    month = floor_date(as.Date(started_at, tz = "America/Chicago"), "month"),
     hour = hour(started_at),
     day = wday(started_at, label = TRUE),
     .before = start_station_name
@@ -686,9 +699,7 @@ Rides with negative duration are now possible, so these need to be checked and c
 #| dev: "svg"
 
 bike_rides %>%
-  group_by(
-    month = floor_date(as.Date(started_at), "month")
-  ) %>%
+  group_by(month) %>%
   summarise(
     nrt = mean(ride_time < 0) * 100
   ) %>%
@@ -760,18 +771,21 @@ bike_rides <- bike_rides %>%
 
 ##### Other ride duration issues
 
-The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset. There are still rides present which are less than this minimum and these should be removed.
+The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset. Cyclistic help pages note that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined $1200.
 
-Cyclistic help pages state that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined $1200.
+These types of rides should not be present.
 
 ```{r}
 #| label: tbl-short-long
 #| tbl-cap: "Trips less than 60 seconds and more than 24 hours"
 bike_rides %>%
-  summarise("< 60 seconds" = sum(ride_time < 60), "> 24 hours" = sum(ride_time > 86000))
+  summarise(
+    "< 60 seconds" = sum(ride_time < 60),
+    "> 24 hours" = sum(ride_time > 86000)
+  )
 ```
 The significant number of short trips indicate these have not been removed from the data prior to upload.
-These rides can be removed.
+These short rides and rides which can be classified as stolen are removed.
 
 ```{r}
 #| label: lst-filter-short-long
@@ -780,4 +794,64 @@ bike_rides <- bike_rides %>%
   filter(ride_time > 60, ride_time < 86000)
 ```
 
+After cleaning the processed dataset is saved as a `RDS` file.
+```{r}
+#| eval: false
+write_rds(bike_rides, "data/processed/bike_rides.rds", compress = "gz")
+```
 
+```{r}
+#| eval: false
+bike_rides <- read_rds("data/processed/bike_rides.rds")
+```
+## Analysis
+
+```{r}
+#| label: fig-rides-bike-user
+#| fig-cap: "Rides per month by market segment"
+#| warning: false
+#| dev: "svg"
+basic <- bike_rides %>%
+  group_by(user_bike, month) %>%
+  summarise(
+    rides = n(),
+    duration = median(as.numeric(ride_time, units = "minutes"))
+  )
+
+basic %>%
+  ggplot(aes(month, rides, group = user_bike, colour = user_bike)) +
+  geom_line() +
+  scale_y_continuous(
+    breaks = scales::breaks_width(50000),
+    labels = scales::label_comma()
+  ) +
+  labs(
+    x = "Month",
+    y = "Rides per month",
+    colour = "Segment"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#| label: fig-duration-bike-user
+#| fig-cap: "Median ride duration by market segment"
+#| warning: false
+#| dev: "svg"
+basic %>%
+  ggplot(
+    aes(
+      month, duration,
+      group = user_bike,
+      colour = user_bike
+    )
+  ) +
+  geom_line() +
+  ylim(0, 30.5) +
+  labs(
+    x = "Month",
+    y = "Median ride duration in minutes",
+    colour = "Segment"
+  ) +
+  theme_minimal()
+```
