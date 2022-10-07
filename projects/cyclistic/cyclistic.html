@@ -276,11 +276,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Data cleaning and preparation</h1>
 <section id="initial-import" class="level3">
 <h3 data-anchor-id="initial-import">Initial import</h3>
-<div class="cell" data-hash="cyclistic_cache/html/lst-load-libraries_4276fde1fe9d7a3ae28ef5090cd8f172">
+<div class="cell">
 
 </div>
 <p>The Divvy trip data files have a consistent naming format <code>YYYYMM-divvy-tripdata.zip</code>. This allows file names to be generated for months in the range September 2021 to August 2022.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-file-list_12fbf503f4a5f8254aee4f5ea0b2a4ca">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
@@ -300,7 +300,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>To preserve a local copy of the original data, zip files are downloaded to the <code>data/raw</code> folder. The folder is checked each time the script is run, and files which are already present are removed from the download list.</p>
 <p>Any files which are not present in the <code>data/raw</code>folder are downloaded.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-download-archives_12cc2976cf86a81c9bfe0761e9a736ee">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2" data-caption="download zip archives"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"data/raw/{divvy_files}"</span>)</span>
@@ -316,7 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </details>
 </div>
 <p>The first 1000 rows are read from September 2021 zip file. This allows <code>read_csv</code> to determine the type of data in each column. The “guessed” column type specification can then inspected using the <code>spec</code> function.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-guess-cols_cb902a8c7378cd37373985d661958714">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bike_inspect <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
@@ -349,7 +349,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>The types defined in the column specification appear to be reasonable choices based on naming of the columns.</p>
 <p>To verify column naming is consistent across all files, the header row from each file is read. The resulting data frame is processed using <code>distinct()</code> to eliminate duplicated rows. If all headers are identical the resulting data frame will have a single row.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-check-headers_c5ef37b19e1486448b58b8a85e57e066">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bike_headers <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
@@ -419,7 +419,7 @@ $ X13 &lt;chr&gt; "member_casual"</code></pre>
 </details>
 </div>
 <p>To improve readability <code>rideable_type</code> is renamed to <code>bike_type</code> and the <code>_bike</code> suffix removed from the factor levels. <code>member_casual</code> is renamed to <code>user_type</code> and the factor levels given inital caps. An additional column is added which combines the <code>bike_type</code> and <code>user_type</code> categorical variables.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-recode-factors_caae4b5d9ded35954559b46eb757b0b0">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -447,7 +447,7 @@ $ X13 &lt;chr&gt; "member_casual"</code></pre>
 <section id="data-inspection" class="level3">
 <h3 data-anchor-id="data-inspection">Data inspection</h3>
 <p>With the data loaded from file, the data structure can checked with <code>glimpse()</code>.</p>
-<div class="cell" data-tbl-cap="Structure of imported data" data-markup="true" data-hash="cyclistic_cache/html/tbk-check-data-structure_d9eba1dac4c2217bde7794d84b599db4">
+<div class="cell" data-tbl-cap="Structure of imported data" data-markup="true">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bike_rides)</span></code></pre></div>
@@ -472,7 +472,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The output indicates that the data set has 5,883,043 rows, and 14 columns. The <code>start_station_name</code>, <code>start_stattion_id</code>, <code>end_station_name</code> and <code>end_station_id</code> columns appear to have a number of missing values - identified by <code>NA</code>.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-missing-values_3c6cbb33da5ba6afa6e181a04a0c7940">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -561,7 +561,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-missing-values">Table&nbsp;1</a> indicates a significant number of observations are missing end and start station name and id. End station location information is also missing small number of records. All other columns have complete data.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-missing-by-station_0875328ce90873fb758c27a5a845d01c">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -603,7 +603,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-missing-by-station">Table&nbsp;2</a> indicates that 22.49% of all rides are missing data for at least one docking station. This should be checked to determine whether this is due to error or a systematic reason.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-coord-range_794f4cecaf013154d49bc146adf2323c">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -648,7 +648,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 <p>The maximum start longitude and latitude values listed in <a href="#tbl-coord-range">Table&nbsp;3</a> are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.</p>
 <p>It appears that some latitude and longitude values may have been rounded to two significant digits. Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values. Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre area centred on the given grid location.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-clipped-start_3295a935b1fb636d0041c0ca3910e2f6">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -688,7 +688,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>Comparing <a href="#tbl-missing-values">Table&nbsp;1</a> with <a href="#tbl-clipped-start">Table&nbsp;4</a> indicates the number of start stations with missing names is the same as those which have rounded coordinates.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-clipped-end_d934f7d87b587ddc476cfc8df90a4f5d">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -731,7 +731,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>This suggests that there is a systemic reason for the missing data, rather than error. It seems likely the location data has been anonymised to protect riders privacy. This needs to be verified with Cyclistics data collection team.</p>
 <p>The ride duration and other information appear plausible and the lack of location data does not impact analysis of this data. Records with missing location information will be retained but filtered for any analysis which depends on accurate location.</p>
 <p>While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named. These need to be checked during cleaning.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-date-ranges_72a12a7a0db6fe67a17ba1bff8c0aa65">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -767,7 +767,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-date-ranges">Table&nbsp;6</a> indicates the dataset includes rides which finished after August 2022.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-14_56a2c4a952758bbec6cbe90de3d2ac36">
+<div class="cell">
 
 </div>
 <p>In total 115 rides are active at midnight on 31 August 2022. As these overnight rides cause issues with data visualisation and other analysis, I chose to remove rides which finished after mid</p>
@@ -777,7 +777,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <section id="missing-end-station-coordinates" class="level4">
 <h4 data-anchor-id="missing-end-station-coordinates">Missing end station coordinates</h4>
 <p>The end stations with missing name and coordinates are addressed first.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-no-end-coords_84811c48ec5dd75491d5e42ae11930f9">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>no_end_coords <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -893,7 +893,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The preview of these rides contains several rides which extend for more than a day. Cyclistic treat bikes unlocked for more than 24 hours as stolen. These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.</p>
-<div class="cell" data-hash="cyclistic_cache/html/fig-rides-missing-end-coord_64fc31fa9318103d7767c9ea7b168e77">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>n_e_c <span class="ot">&lt;-</span> no_end_coords <span class="sc">%&gt;%</span></span>
@@ -929,7 +929,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <h4 data-anchor-id="cyclistic-operational-rides">Cyclistic operational rides</h4>
 <p>A list of stations that were <em>In-Service</em> between September 2021 and August 2022 was extracted from a dataset maintained by City of Chicago. The dataset for the period of interest contains over 35 million rows recording the status of each docking station at hour intervals.</p>
 <p>Due to the size of the dataset the processed listing of stations is used in this analysis.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-stations-in-use_00a59d4e1d8f503d34d80ba1e2701bef">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>active_stations <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
@@ -947,10 +947,10 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
 <colgroup>
-<col style="width: 26%">
-<col style="width: 48%">
-<col style="width: 12%">
-<col style="width: 13%">
+<col style="width: 23%">
+<col style="width: 54%">
+<col style="width: 10%">
+<col style="width: 11%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -962,40 +962,40 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Clinton St &amp; Roosevelt Rd</td>
-<td style="text-align: right;">41.86712</td>
-<td style="text-align: right;">-87.64109</td>
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">Houston Ave &amp; 91st St</td>
+<td style="text-align: right;">41.72996</td>
+<td style="text-align: right;">-87.54964</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2021-09-07 22:05:45</td>
-<td style="text-align: left;">Narragansett &amp; Irving Park</td>
-<td style="text-align: right;">41.95261</td>
-<td style="text-align: right;">-87.78538</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Dearborn St &amp; Adams St</td>
-<td style="text-align: right;">41.87936</td>
-<td style="text-align: right;">-87.62979</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Austin Blvd &amp; Chicago Ave</td>
-<td style="text-align: right;">41.89489</td>
-<td style="text-align: right;">-87.77470</td>
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">Percy Julian HS</td>
+<td style="text-align: right;">41.70600</td>
+<td style="text-align: right;">-87.65381</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - Saginaw Ave &amp; 93rd St</td>
-<td style="text-align: right;">41.72620</td>
-<td style="text-align: right;">-87.55925</td>
+<td style="text-align: left;">Public Rack - Sawyer Ave &amp; Bryn Mawr Ave - SW</td>
+<td style="text-align: right;">41.98288</td>
+<td style="text-align: right;">-87.71053</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Central Park Ave &amp; Elbridge Ave</td>
-<td style="text-align: right;">41.93534</td>
-<td style="text-align: right;">-87.71689</td>
+<td style="text-align: left;">Field Museum</td>
+<td style="text-align: right;">41.86531</td>
+<td style="text-align: right;">-87.61787</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Central Ave &amp; Lake St</td>
+<td style="text-align: right;">41.88766</td>
+<td style="text-align: right;">-87.76547</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">California Ave &amp; Ogden Ave</td>
+<td style="text-align: right;">41.86087</td>
+<td style="text-align: right;">-87.69568</td>
 </tr>
 </tbody>
 </table>
@@ -1005,7 +1005,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 <p>A random sample of stations from the dataset is shown in <a href="#tbl-stations-in-use">Table&nbsp;8</a>. The timestamp indicates the first time a station appears as <em>In-Service</em> in the original dataset.</p>
 <p>The active stations dataset is used to identify stations that were not listed as publicly available.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-unlisted-stations_885697b86301e2ef929fb21e42461a78">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>unlisted_start <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1313,7 +1313,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>Some named stations were found to have rounded location coordinates. Additionally there is some inaccuracy of reported location coordinates.</p>
 <p>To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.</p>
 <p>Joining the <code>active_station</code> data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-cleaning-truncated-coords_7345ff0a74c7cb0fc6c7d4cb00b710c1">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22" data-caption="Clean named station coordinates"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1354,7 +1354,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_lng"</span>), <span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_lat"</span>))</span></code></pre></div>
 </details>
 </div>
-<div class="cell" data-hash="cyclistic_cache/html/lst-stations-per-coord_018424b17c32be06838883d67c58a2eb">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23" data-caption="Exctract bounding coordinates"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ss <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1390,7 +1390,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </details>
 </div>
-<div class="cell" data-hash="cyclistic_cache/html/fig-location-compare_e1435f8bf0e4e6376c33c62ac2371e47">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggmap</span>(chi_map) <span class="sc">+</span></span>
@@ -1674,7 +1674,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </section>
 <section id="addressing-negative-ride-durations" class="level5">
 <h5 data-anchor-id="addressing-negative-ride-durations">Addressing negative ride durations</h5>
-<div class="cell" data-hash="cyclistic_cache/html/fig-negative-ride-duration_54f44e937a7dadf72220d1a00ab3f3eb">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1700,7 +1700,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-days-neg-rides_0f390477047e02f2413111cd7978ed1b">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1765,7 +1765,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#fig-negative-ride-duration">Figure&nbsp;3</a> and <a href="#tbl-days-neg-rides">Table&nbsp;13</a> show that the percentage rides with negative durations is around three times higher on 7th November than the next highest day - 29th September.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-hour-neg-rides_f4555a4deb7f40f654c4438c76c0773d">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1809,7 +1809,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p>The negative duration of rides which start and end between 1.00am and 2.00am can be resolved by adding 60 minutes. However the ambiguity of the rides which have one end point in this time range remains.</p>
 <p>I recommend that timezone be recorded as part of the timestamp in future to avoid these issues.</p>
 <p>For the present analysis I’ve chosen to correct the negative timestamps between 1.00am and 2.00am and to leave the ambiguous timestamps unaltered.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-remove-dst-negatives_7a2a248769f9e4b8a9d65eb3b33d9186">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30" data-caption="Correct dst change ride durations"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1825,7 +1825,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <h5 data-anchor-id="other-ride-duration-issues">Other ride duration issues</h5>
 <p>The <a href="https://ride.divvybikes.com/system-data">Cyclistic website</a> indicates that rides of less than 60 seconds have been removed from the dataset. Cyclistic help pages note that if rides <a href="https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen">exceed 24 hours</a> the bike is treated as stolen and the user can be fined $1200.</p>
 <p>These types of rides should not be present.</p>
-<div class="cell" data-hash="cyclistic_cache/html/tbl-short-long_ae67c042c0775e986331cbbb24ad2000">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="sc">%&gt;%</span></span>
@@ -1857,7 +1857,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p>The significant number of short trips indicate these have not been removed from the data prior to upload. These short rides and rides which can be classified as stolen are removed.</p>
-<div class="cell" data-hash="cyclistic_cache/html/lst-filter-short-long_82d7f8d082e05fdea77a6006afa164e8">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32" data-caption="Filter short and long "><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1868,13 +1868,13 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </details>
 </div>
 <p>After cleaning the processed dataset is saved as a <code>RDS</code> file.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-31_69cfa032a793557b330d6c9f443afa6c">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bike_rides, <span class="st">"data/processed/bike_rides.rds"</span>, <span class="at">compress =</span> <span class="st">"gz"</span>)</span></code></pre></div>
 </details>
 </div>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-32_24565effec5ddb72207c967c9e4172a5">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>bike_rides <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/processed/bike_rides.rds"</span>)</span></code></pre></div>
@@ -1885,7 +1885,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </section>
 <section id="analysis" class="level2">
 <h2 data-anchor-id="analysis">Analysis</h2>
-<div class="cell" data-hash="cyclistic_cache/html/lst-median-n-rides_c306d78621f4bbe50c11f45e84c8a688">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>basic <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1899,7 +1899,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 </div>
-<div class="cell" data-fig.asp="0.5625" data-hash="cyclistic_cache/html/fig-duration-bike-user_b48f4c0f6a59927d621b50f0e4eba555">
+<div class="cell" data-fig.asp="0.5625">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>basic <span class="sc">%&gt;%</span></span>
@@ -1936,7 +1936,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <p><em>Casual-Docked</em> consistently has the longest median ride duration and appears to capture rides taken on a day pass. For this analysis I have assumed that <em>Casual-Docked</em> rides are primarily visitor traffic. As visitors are unlikely to take up membership, they can be dropped from the analysis.</p>
 <p>Both member and casual groups electric bikes have a shorter ride duration than classic bikes.</p>
 <p>Cyclistic pricing changed on 10 May 2022. The changes reduced the casual unlock fee from $3.30 to $1.00 and removed 30 minutes included time for classic bikes and e-bike trips. There is an indication that the median duration for <em>Casual-Classic</em> and <em>Casual-Electric</em> trips has declined from May 2022 onwards.</p>
-<div class="cell" data-hash="cyclistic_cache/html/unnamed-chunk-35_fa9a0104d68da0a7b9a502b5eb32ebcc">
+<div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>day_rides <span class="ot">&lt;-</span> bike_rides <span class="sc">%&gt;%</span></span>
@@ -1956,7 +1956,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 </div>
-<div class="cell" data-fig.asp="0.5625" data-hash="cyclistic_cache/html/fig-rides-bike-user_8febd7470afa8587b69880e5db09a995">
+<div class="cell" data-fig.asp="0.5625">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>basic <span class="sc">%&gt;%</span></span>
@@ -1990,7 +1990,7 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-<div class="cell" data-fig.asp="1.25" data-hash="cyclistic_cache/html/fig-dist-median-daily-ride-time_c696387b35bbdfd42e1d5978aad9c0d1">
+<div class="cell" data-fig.asp="1.25">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> day_rides <span class="sc">%&gt;%</span></span>
@@ -2006,31 +2006,32 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
 <span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
 <span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>      duration_mins,</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">colour =</span> user_bike,</span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">fill =</span> user_bike,</span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">group =</span> user_bike</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span></span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">adjust =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> m,</span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">xintercept =</span> mean_duration</span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="dv">2</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">colour =</span> weekend,</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">group =</span> weekend,</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fl">0.7</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">adjust =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> m,</span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">xintercept =</span> mean_duration,</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">colour =</span> weekend,</span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fl">0.8</span></span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(</span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vars</span>(user_bike),</span>
-<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">vars</span>(weekend)</span>
-<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
-<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"none"</span>,</span>
-<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"none"</span></span>
-<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">25</span>) <span class="sc">+</span></span>
-<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Median daily ride duration"</span>)</span></code></pre></div>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vars</span>(user_bike)</span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="st">"none"</span></span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Median daily ride duration"</span>,</span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"Day Type"</span></span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-dist-median-daily-ride-time" class="quarto-figure quarto-figure-center">
