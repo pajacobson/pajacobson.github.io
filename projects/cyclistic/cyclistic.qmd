@@ -935,30 +935,31 @@ day_rides %>%
   ggplot(
     aes(
       duration_mins,
-      colour = user_bike,
-      fill = user_bike,
-      group = user_bike
-    ),
-    alpha = 0.5
+      colour = weekend,
+      group = weekend,
+      alpha = 0.7
+    )
   ) +
   geom_density(adjust = 3) +
   geom_vline(
     data = m,
     aes(
-      xintercept = mean_duration
-    ),
-    linetype = 2
+      xintercept = mean_duration,
+      colour = weekend,
+      alpha = 0.8
+    )
   ) +
   facet_grid(
-    rows = vars(user_bike),
-    cols = vars(weekend)
+    rows = vars(user_bike)
   ) +
   guides(
-    colour = "none",
-    fill = "none"
+    alpha = "none"
   ) +
   theme_minimal() +
   xlim(0, 25) +
-  labs(x = "Median daily ride duration")
+  labs(
+    x = "Median daily ride duration",
+    colour = "Day Type"
+  )
 ```
 
