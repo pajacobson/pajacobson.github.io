@@ -664,7 +664,8 @@ bike_rides <- bike_rides %>%
     ride_time = as.duration(ride_int),
     month = floor_date(as.Date(started_at, tz = "America/Chicago"), "month"),
     hour = hour(started_at),
-    day = wday(started_at, label = TRUE),
+    dayw = wday(started_at, label = TRUE),
+    daym = day(started_at),
     .before = start_station_name
   )
 
@@ -718,8 +719,14 @@ bike_rides %>%
 #| warning: false
 
 bike_rides %>%
-  group_by(Month = month, Day = day(started_at)) %>%
-  summarise("Percent Negative" = mean(ride_time < 0) * 100, .groups = "drop") %>%
+  group_by(
+    Month = month,
+    Day = daym
+  ) %>%
+  summarise(
+    "Percent Negative" = mean(ride_time < 0) * 100,
+    .groups = "drop"
+  ) %>%
   filter(`Percent Negative` > 0) %>%
   slice_max(`Percent Negative`, n = 6)
 ```
@@ -790,7 +797,10 @@ These short rides and rides which can be classified as stolen are removed.
 #| label: lst-filter-short-long
 #| lst-cap: "Filter short and long "
 bike_rides <- bike_rides %>%
-  filter(ride_time > 60, ride_time < 86000)
+  filter(
+    ride_time > 60,
+    ride_time < 86000
+  )
 ```
 
 After cleaning the processed dataset is saved as a `RDS` file.
@@ -806,35 +816,23 @@ bike_rides <- read_rds("data/processed/bike_rides.rds")
 ## Analysis
 
 ```{r}
-#| label: fig-rides-bike-user
-#| fig-cap: "Rides per month by market segment"
+#| label: lst-median-n-rides
 #| warning: false
-#| dev: "svg"
 basic <- bike_rides %>%
-  group_by(user_bike, month) %>%
+  group_by(
+    user_bike,
+    month
+  ) %>%
   summarise(
     rides = n(),
     duration = median(as.numeric(ride_time, units = "minutes"))
   )
-
-basic %>%
-  ggplot(aes(month, rides, group = user_bike, colour = user_bike)) +
-  geom_line() +
-  scale_y_continuous(
-    breaks = scales::breaks_width(50000),
-    labels = scales::label_comma()
-  ) +
-  labs(
-    x = "Month",
-    y = "Rides per month",
-    colour = "Segment"
-  ) +
-  theme_minimal()
 ```
 
 ```{r}
 #| label: fig-duration-bike-user
 #| fig-cap: "Median ride duration by market segment"
+#| fig-asp: .5625
 #| warning: false
 #| dev: "svg"
 basic %>%
@@ -846,11 +844,121 @@ basic %>%
     )
   ) +
   geom_line() +
+  scale_x_date(
+    breaks = scales::breaks_width("2 months"),
+    labels = scales::label_date("%b %Y", tz = "America/Chicago")
+  ) +
   ylim(0, 30.5) +
   labs(
-    x = "Month",
+    x = NULL,
     y = "Median ride duration in minutes",
     colour = "Segment"
   ) +
   theme_minimal()
 ```
+
+@fig-duration-bike-user shows the median ride time for each month for the five combinations of bicycle and user type.
+Member rides are consistently shorter than casual rides.
+
+_Casual-Docked_ consistently has the longest median ride duration and appears to capture rides taken on a day pass. For this analysis I have assumed that _Casual-Docked_ rides are primarily visitor traffic. As visitors are unlikely to take up membership, they can be dropped from the analysis.
+
+Both member and casual groups electric bikes have a shorter ride duration than classic bikes.
+
+Cyclistic pricing changed on 10 May 2022. The changes reduced the casual unlock fee from $3.30 to $1.00 and removed 30 minutes included time for classic bikes and e-bike trips. There is an indication that the median duration for _Casual-Classic_ and _Casual-Electric_ trips has declined from May 2022 onwards.
+
+```{r}
+#| warning: false
+day_rides <- bike_rides %>%
+  filter(bike_type != "Docked") %>%
+  mutate(weekend = if_else(
+    dayw %in% c("Sat", "Sun"),
+    "Weekend",
+    "Weekday"
+  )) %>%
+  group_by(
+    user_bike,
+    yday = floor_date(started_at, "day")
+  ) %>%
+  summarise(
+    weekend,
+    duration_mins = as.numeric(median(ride_time)) / 60
+  )
+```
+
+```{r}
+#| label: fig-rides-bike-user
+#| fig-cap: "Rides per month by market segment"
+#| fig-asp: .5625
+#| warning: false
+#| dev: "svg"
+
+basic %>%
+  ggplot(aes(
+    month, rides,
+    group = user_bike,
+    colour = user_bike
+  )) +
+  geom_line() +
+  scale_y_continuous(
+    breaks = scales::breaks_width(50000),
+    labels = scales::label_comma()
+  ) +
+  scale_x_date(
+    breaks = scales::breaks_width("2 months"),
+    labels = scales::label_date("%b %Y", tz = "America/Chicago")
+  ) +
+  labs(
+    x = NULL,
+    y = "Rides per month",
+    colour = "Segment"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#| warning: false
+#| label: fig-dist-median-daily-ride-time
+#| fig-cap: "Distribution of median daily ride times"
+#| fig-asp: 1.25
+#| dev: "svg"
+
+m <- day_rides %>%
+  group_by(
+    user_bike,
+    weekend
+  ) %>%
+  summarise(
+    mean_duration = mean(duration_mins)
+  )
+
+day_rides %>%
+  ggplot(
+    aes(
+      duration_mins,
+      colour = user_bike,
+      fill = user_bike,
+      group = user_bike
+    ),
+    alpha = 0.5
+  ) +
+  geom_density(adjust = 3) +
+  geom_vline(
+    data = m,
+    aes(
+      xintercept = mean_duration
+    ),
+    linetype = 2
+  ) +
+  facet_grid(
+    rows = vars(user_bike),
+    cols = vars(weekend)
+  ) +
+  guides(
+    colour = "none",
+    fill = "none"
+  ) +
+  theme_minimal() +
+  xlim(0, 25) +
+  labs(x = "Median daily ride duration")
+```
+
