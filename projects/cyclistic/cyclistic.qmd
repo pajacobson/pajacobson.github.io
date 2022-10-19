@@ -19,7 +19,8 @@ editor:
   markdown:
     wrap: sentence
 ---
-:::{.column-body}
+
+::: column-body
 ![](images/josh-mccausland-8TfeD3J4VtQ-thumb.png)
 :::
 
@@ -232,7 +233,10 @@ bike_rides <- map_dfr(
     )
 )
 ```
-To improve readability `rideable_type` is renamed to `bike_type` and the `_bike` suffix removed from the factor levels. `member_casual` is renamed to `user_type` and the factor levels given inital caps. An additional column is added which combines the `bike_type` and `user_type` categorical variables.
+
+To improve readability `rideable_type` is renamed to `bike_type` and the `_bike` suffix removed from the factor levels.
+`member_casual` is renamed to `user_type` and the factor levels given inital caps.
+An additional column is added which combines the `bike_type` and `user_type` categorical variables.
 
 ```{r}
 #| label: lst-recode-factors
@@ -268,7 +272,8 @@ With the data loaded from file, the data structure can checked with `glimpse()`.
 glimpse(bike_rides)
 ```
 
-The output indicates that the data set has `r format(nrow(bike_rides), big.mark = ",")` rows, and `r ncol(bike_rides)` columns.  The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing values - identified by `NA`.
+The output indicates that the data set has `r format(nrow(bike_rides), big.mark = ",")` rows, and `r ncol(bike_rides)` columns.
+The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing values - identified by `NA`.
 
 ```{r}
 #| label: tbl-missing-values
@@ -306,7 +311,8 @@ bike_rides %>%
   )
 ```
 
-@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station. This should be checked to determine whether this is due to error or a systematic reason.
+@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station.
+This should be checked to determine whether this is due to error or a systematic reason.
 
 ```{r}
 #| label: tbl-coord-range
@@ -320,7 +326,8 @@ bike_rides %>%
   )
 ```
 
-The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values. This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
+The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values.
+This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
 
 It appears that some latitude and longitude values may have been rounded to two significant digits.
 Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
@@ -435,7 +442,8 @@ n_e_c %>%
   theme_minimal()
 ```
 
-@fig-rides-missing-end-coord shows that the majority of ride with missing end coordinates had a duration of more than 24 hours. Notably casual rides are the biggest contributor.
+@fig-rides-missing-end-coord shows that the majority of ride with missing end coordinates had a duration of more than 24 hours.
+Notably casual rides are the biggest contributor.
 
 #### Cyclistic operational rides
 
@@ -650,9 +658,10 @@ ggmap(chi_map) +
 ```
 
 #### Ride duration
+
 ##### Adding Ride Duration, Time and Day of Week
 
-To add analysis calculated columns for the length of ride, the hour the ride started and the day of week are added to the dataset.
+To aid analysis of temporal variation in cohort behaviour, calculated columns for the ride duration, and the hour, day, and month each ride started are added to the dataset.
 
 ```{r}
 #| label: tbl-add-duration
@@ -677,7 +686,6 @@ bike_rides %>%
 @tbl-add-duration shows a sample of the resulting dataset with added columns.
 Minimum and maximum ride times can now be checked for plausibility.
 
-
 ```{r}
 #| label: tbl-ride-min-max
 #| tbl-cap: "Summary of ride duration (hours)"
@@ -689,7 +697,7 @@ bike_rides %>%
   )
 ```
 
-Rides with negative duration are now possible, so these need to be checked and cleaned.
+Both minimum and maximum ride durations indicate the data set contains values which need to be checked, and possibly removed. Ride times of less than zero should not occur and ride times of 28 days are very unlikely given the accrued charges would be around $6500 at casual trip rates.
 
 ##### Addressing negative ride durations
 
@@ -777,7 +785,8 @@ bike_rides <- bike_rides %>%
 
 ##### Other ride duration issues
 
-The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset. Cyclistic help pages note that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined $1200.
+The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset.
+Cyclistic help pages note that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined \$1200.
 
 These types of rides should not be present.
 
@@ -790,6 +799,7 @@ bike_rides %>%
     "> 24 hours" = sum(ride_time > 86000)
   )
 ```
+
 The significant number of short trips indicate these have not been removed from the data prior to upload.
 These short rides and rides which can be classified as stolen are removed.
 
@@ -804,6 +814,7 @@ bike_rides <- bike_rides %>%
 ```
 
 After cleaning the processed dataset is saved as a `RDS` file.
+
 ```{r}
 #| eval: false
 write_rds(bike_rides, "data/processed/bike_rides.rds", compress = "gz")
@@ -813,6 +824,7 @@ write_rds(bike_rides, "data/processed/bike_rides.rds", compress = "gz")
 #| eval: false
 bike_rides <- read_rds("data/processed/bike_rides.rds")
 ```
+
 ## Analysis
 
 ```{r}
@@ -860,11 +872,15 @@ basic %>%
 @fig-duration-bike-user shows the median ride time for each month for the five combinations of bicycle and user type.
 Member rides are consistently shorter than casual rides.
 
-_Casual-Docked_ consistently has the longest median ride duration and appears to capture rides taken on a day pass. For this analysis I have assumed that _Casual-Docked_ rides are primarily visitor traffic. As visitors are unlikely to take up membership, they can be dropped from the analysis.
+*Casual-Docked* consistently has the longest median ride duration and appears to capture rides taken on a day pass.
+For this analysis I have assumed that *Casual-Docked* rides are primarily visitor traffic.
+As visitors are unlikely to take up membership, they can be dropped from the analysis.
 
 Both member and casual groups electric bikes have a shorter ride duration than classic bikes.
 
-Cyclistic pricing changed on 10 May 2022. The changes reduced the casual unlock fee from $3.30 to $1.00 and removed 30 minutes included time for classic bikes and e-bike trips. There is an indication that the median duration for _Casual-Classic_ and _Casual-Electric_ trips has declined from May 2022 onwards.
+Cyclistic pricing changed on 10 May 2022.
+The changes reduced the casual unlock fee from \$3.30 to \$1.00 and removed 30 minutes included time for classic bikes and e-bike trips.
+There is an indication that the median duration for *Casual-Classic* and *Casual-Electric* trips has declined from May 2022 onwards.
 
 ```{r}
 #| warning: false
@@ -881,8 +897,10 @@ day_rides <- bike_rides %>%
   ) %>%
   summarise(
     weekend,
+    n = n(),
     duration_mins = as.numeric(median(ride_time)) / 60
-  )
+  ) %>%
+  distinct()
 ```
 
 ```{r}
@@ -940,14 +958,15 @@ day_rides %>%
       alpha = 0.7
     )
   ) +
-  geom_density(adjust = 3) +
+  geom_density() +
   geom_vline(
     data = m,
     aes(
       xintercept = mean_duration,
       colour = weekend,
       alpha = 0.8
-    )
+    ),
+    linetype = 2
   ) +
   facet_grid(
     rows = vars(user_bike)
@@ -956,10 +975,47 @@ day_rides %>%
     alpha = "none"
   ) +
   theme_minimal() +
-  xlim(0, 25) +
+  theme(legend.key = element_blank()) +
+  xlim(5, 25) +
   labs(
     x = "Median daily ride duration",
     colour = "Day Type"
   )
 ```
+```{r}
+#| fig-asp: 1.25
+#| dev: "svg"
+weather <- read_csv(
+  "data/raw/chicago_climate_data_noaa.csv",
+  show_col_types = FALSE,
+  name_repair = janitor::make_clean_names
+) %>%
+  filter(station == "USW00094846")
 
+rides_temp <- day_rides %>%
+  inner_join(
+    select(
+      .data = weather,
+      date,
+      tavg,
+      tmin,
+      tmax,
+      awnd,
+      prcp
+    ),
+    by = c("yday" = "date")
+  )
+
+model <- rides_temp %>%
+  lm(n ~ tmax, data = .)
+rides_temp$fitted <- model$fitted.values
+summary(model)
+rides_temp %>%
+  ggplot(aes(tmax, n)) +
+  geom_point(alpha = 0.7) +
+  geom_point(aes(tmax, fitted), color = "red", alpha = 0.5) +
+  facet_grid(
+    rows = vars(user_bike),
+    cols = vars(weekend)
+  )
+```
