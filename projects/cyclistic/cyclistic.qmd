@@ -983,6 +983,7 @@ day_rides %>%
   )
 ```
 ```{r}
+#| label: fig-avg-median-temp-rides
 #| fig-asp: 1.25
 #| dev: "svg"
 weather <- read_csv(
@@ -1006,16 +1007,37 @@ rides_temp <- day_rides %>%
     by = c("yday" = "date")
   )
 
-model <- rides_temp %>%
-  lm(n ~ tmax, data = .)
-rides_temp$fitted <- model$fitted.values
-summary(model)
 rides_temp %>%
-  ggplot(aes(tmax, n)) +
-  geom_point(alpha = 0.7) +
-  geom_point(aes(tmax, fitted), color = "red", alpha = 0.5) +
+  ggplot(aes(tmax, n, group = user_bike)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(color = "red", alpha = 0.5) +
   facet_grid(
     rows = vars(user_bike),
     cols = vars(weekend)
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Maximum Temperature <U+00B0>C",
+    y = "Rides"
+  )
+```
+
+```{r}
+#| label: fig-avg-wind-daily-rides
+#| fig-asp: 1.25
+#| dev: "svg"
+
+rides_temp %>%
+  ggplot(aes(awnd, n, group = user_bike)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(color = "red", alpha = 0.5, method = "lm", se = FALSE) +
+  facet_grid(
+    rows = vars(user_bike),
+    cols = vars(weekend)
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Average Windspeed",
+    y = "Rides"
   )
 ```
