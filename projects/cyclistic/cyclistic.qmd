@@ -842,7 +842,7 @@ basic <- bike_rides %>%
 ```{r}
 #| label: fig-duration-bike-user
 #| fig-cap: "Median ride duration by market segment"
-#| fig-asp: .5625
+#| fig-asp: .7
 #| warning: false
 #| dev: "svg"
 basic %>%
@@ -864,7 +864,8 @@ basic %>%
     y = "Median ride duration in minutes",
     colour = "Segment"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 
 @fig-duration-bike-user shows the median ride time for each month for the five combinations of bicycle and user type. Member rides are consistently shorter than casual rides.
@@ -908,7 +909,7 @@ m <- day_rides %>%
 #| warning: false
 #| label: fig-dist-median-daily-ride-time
 #| fig-cap: "Distribution of median daily ride times"
-#| fig-asp: 1.25
+#| fig-asp: 1.1
 #| dev: "svg"
 
 day_rides %>%
@@ -936,12 +937,15 @@ day_rides %>%
   guides(
     alpha = "none"
   ) +
-  theme_minimal() +
-  theme(legend.key = element_blank()) +
   xlim(5, 25) +
   labs(
     x = "Median daily ride duration",
     colour = "Day Type"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.key = element_blank(),
+    legend.position = "bottom"
   )
 ```
 
@@ -952,8 +956,7 @@ A weaker bimodal distribution is evident in weekend member rides and casual ride
 Both member and casual groups electric bikes have a shorter ride duration than classic bikes.
 
 Cyclistic pricing changed on 10 May 2022.
-The changes reduced the casual unlock fee from \$3.30 to \$1.00 and removed 30 minutes included time for classic bikes and e-bike trips.
-There is an indication that the median duration for *Casual-Classic* and *Casual-Electric* trips has declined from May 2022 onwards.
+The changes reduced the casual unlock fee from \$3.30 to \$1.00 and removed 30 minutes included time for classic bikes and e-bike trips. There is an indication that the median duration for *Casual-Classic* and *Casual-Electric* trips has declined from May 2022 onwards.
 
 #### Seasonal influence
 
@@ -962,10 +965,13 @@ Member and Casual riding patterns appear to be sensitive to seasonal influences.
 #| warning: false
 #| label: fig-rides-bike-user
 #| fig-cap: "Rides per month by market segment"
-#| fig-asp: .5625
+#| fig-asp: .70
 #| dev: "svg"
 
 basic %>%
+  filter(
+    user_bike != "Casual-Docked"
+  ) %>%
   ggplot(aes(
     month, rides,
     group = user_bike,
@@ -985,7 +991,8 @@ basic %>%
     y = "Rides per month",
     colour = "Segment"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 The number of rides taken by all cohorts is lowest in January and February, which coincides with the winter season. Peak ride months cover May, June, July, and September with a slight decline during August.
 
@@ -993,7 +1000,7 @@ The number of rides taken by all cohorts is lowest in January and February, whic
 #| warning: false
 #| label: fig-rides-by-day-week
 #| fig-cap: "Seasonal influence on average daily rides"
-#| fig-asp: 1.25
+#| fig-asp: 1.1
 #| dev: "svg"
 
 br_season <- bike_rides %>%
@@ -1035,7 +1042,8 @@ br_season %>%
     colour = "Segment"
   ) +
   facet_grid(rows = vars(season)) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 One of the notable features of winter is the consistent number of daily rides taken by members despite the cold.
 Members take consistently more weekday rides in all seasons.
@@ -1045,7 +1053,7 @@ Peak days for rides on causal plans are weekends - Saturday and Sunday - with a 
 #| warning: false
 #| label: fig-avg-median-temp-rides
 #| fig-cap: "Influence of maximum temperature on ride"
-#| fig-asp: 1.25
+#| fig-asp: 1.1
 #| dev: "svg"
 
 weather <- read_csv(
@@ -1086,17 +1094,73 @@ rides_temp %>%
 
 The influence of maximum daily temperatures on number of rides across weekdays and weekends shown in @fig-avg-median-temp-rides.
 
-Casual classic bike ride numbers remain low when the maximum temperature is 10°C or below. Casual e-bike rides start increasing when the maximum temperature reaches 0°C. TCasual ride numbers appear to decline once the maximum temperature reaches 30 degrees.
+Casual classic bike ride numbers remain low when the maximum temperature is 10°C or below. Casual e-bike rides start increasing when the maximum temperature reaches 0°C. Casual ride numbers appear to decline once the maximum temperature reaches 30 degrees.
 
-Member rides remain at a consistent level right though winter.
-There are similar numbers of electric and classic rides taken during this period. Members show a preference for E-bikes when the temperatures are below 15°C.
+Weekday member rides remain at a consistent level right though winter with similar numbers of electric and classic rides taken. Members show a slight preference for E-bikes when the maximum temperature is below 5°C. Weekend member ride numbers are around 25% lower.
 
 Peak ride numbers occur on days when the maximum temperature is between 25 and 35°C. E-bike ride numbers peak at higher maximum temperatures than classic bikes.
 
-This suggests that E-bikes encourage users to ride when maximum temperatures are in the range of -10°C to +15°C, or above 30°C.
+This suggests that E-bikes encourage casual users to ride when maximum temperatures are in the range of 0°C to +15°C and during hot weather.
 
+Overall, members appear to be less influenced by temperature and seasonal variation than casuals. Member rides have a consistent base of around 2000 rides per weekday through winter. Ride numbers begin to steadily increase once the daily maximum temperature reaches 0°C.
 
+Casual riders who are using E-bikes in cold and hot temperatures on weekdays appear to have similar behaviours to members in that they will ride in a broad range of weather conditions. Riders in this segment who ride several times a month may be candidates for membership.
 
+#### Time of day
+```{r}
+#| label: fig-ride-time-season
+#| fig-cap: "Rides by time of day, day and season"
+#| fig-asp: 1.1
+#| dev: "svg"
+br_season %>%
+  mutate(
+    weekend = if_else(
+      dayw %in% c("Sat", "Sun"),
+      "Weekend",
+      "Weekday"
+    )
+  ) %>%
+  group_by(
+    user_bike,
+    weekend,
+    season,
+    hour
+  ) %>%
+  summarise(
+    avg_rides = n() / n_distinct(date(started_at)),
+    .groups = "drop"
+  ) %>%
+  ggplot(
+    aes(
+      hour,
+      avg_rides,
+      group = user_bike,
+      colour = user_bike
+    )
+  ) +
+  geom_line() +
+  labs(
+    x = "Time of day",
+    y = "Average ride starts per hour",
+    colour = "Segment"
+  ) +
+  facet_grid(
+    rows = vars(season),
+    cols = vars(weekend)
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Member and casual rides show distinct differences between weekday ride times.
+Member ride starts show two well defined peaks aligning with morning and afternoon commutes.  The morning rides peak from 8.00am to 9.00am  while afternoon rides peak at roughly 5:30pm.
+
+Casual rides show a far less defined morning peak. Rides steadily increase across the day peaking at around 5:30pm.
+This may indicate workers in hospitality or retail who start work later in the day have displaying different commute patterns.
+
+All cohorts display a small peak around midday.
+
+Weekend riding patterns show a steady increase with ride starts levelling off around 10.00am then remaining fairly constant until late afternoon. Ride starts then taper off into the evening with a small peak around 8.30pm.
 
 
 
