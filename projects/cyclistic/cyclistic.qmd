@@ -24,7 +24,7 @@ editor:
 ![](images/josh-mccausland-8TfeD3J4VtQ-thumb.png)
 :::
 
-# Background
+## Background
 
 In 2016 Cyclistic launched a bike-sharing sharing offering which has grown to a fleet of 6000 geotracked bicycles and network of more than 1000 stations across Chicago.
 
@@ -36,7 +36,7 @@ This information will provide a basis for members of the marketing analytics tea
 
 The executive team, which is detail oriented, will decide whether the proposed marketing strategies are approved.
 
-# Defining the business task
+## Defining the business task
 
 The scope of this analysis is limited to the first step, and investigates the question:
 
@@ -75,7 +75,7 @@ Riders commuting to work are likely to use docking stations in business district
 Recreational riders may prefer parks and areas along the shoreline or cafe precincts.
 Docking stations with high levels of usage on different days of the week should provide insight into where user hotspots are located.
 
-# Data sources
+## Data sources
 
 ### Divvy Bikes system data and pricing
 
@@ -100,7 +100,7 @@ This information is used to assist identifying Divvy operational rides in the da
 
 [City of Chicago open data listing of Divvy Stations](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq)
 
-# Data cleaning and preparation
+## Data cleaning and preparation
 
 ### Initial import
 
@@ -813,20 +813,18 @@ bike_rides <- bike_rides %>%
   )
 ```
 
-After cleaning the processed dataset is saved as a `RDS` file.
+With cleaning completed the processed dataset is saved as a `RDS` file.
 
 ```{r}
 #| eval: false
 write_rds(bike_rides, "data/processed/bike_rides.rds", compress = "gz")
-```
 
-```{r}
-#| eval: false
 bike_rides <- read_rds("data/processed/bike_rides.rds")
 ```
 
 ## Analysis
 
+#### Ride duration
 ```{r}
 #| label: lst-median-n-rides
 #| warning: false
@@ -869,21 +867,15 @@ basic %>%
   theme_minimal()
 ```
 
-@fig-duration-bike-user shows the median ride time for each month for the five combinations of bicycle and user type.
-Member rides are consistently shorter than casual rides.
+@fig-duration-bike-user shows the median ride time for each month for the five combinations of bicycle and user type. Member rides are consistently shorter than casual rides.
 
-*Casual-Docked* consistently has the longest median ride duration and appears to capture rides taken on a day pass.
-For this analysis I have assumed that *Casual-Docked* rides are primarily visitor traffic.
-As visitors are unlikely to take up membership, they can be dropped from the analysis.
+*Casual-Docked* consistently has the longest median ride duration and appears to identify rides taken on a day pass. For this analysis I have assumed that *Casual-Docked* rides are primarily visitor traffic and are unlikely to take up membership. These rides excluded from further analysis.
 
-Both member and casual groups electric bikes have a shorter ride duration than classic bikes.
-
-Cyclistic pricing changed on 10 May 2022.
-The changes reduced the casual unlock fee from \$3.30 to \$1.00 and removed 30 minutes included time for classic bikes and e-bike trips.
-There is an indication that the median duration for *Casual-Classic* and *Casual-Electric* trips has declined from May 2022 onwards.
 
 ```{r}
+#| label: lst-day-type-of-ride
 #| warning: false
+
 day_rides <- bike_rides %>%
   filter(bike_type != "Docked") %>%
   mutate(weekend = if_else(
@@ -901,44 +893,6 @@ day_rides <- bike_rides %>%
     duration_mins = as.numeric(median(ride_time)) / 60
   ) %>%
   distinct()
-```
-
-```{r}
-#| label: fig-rides-bike-user
-#| fig-cap: "Rides per month by market segment"
-#| fig-asp: .5625
-#| warning: false
-#| dev: "svg"
-
-basic %>%
-  ggplot(aes(
-    month, rides,
-    group = user_bike,
-    colour = user_bike
-  )) +
-  geom_line() +
-  scale_y_continuous(
-    breaks = scales::breaks_width(50000),
-    labels = scales::label_comma()
-  ) +
-  scale_x_date(
-    breaks = scales::breaks_width("2 months"),
-    labels = scales::label_date("%b %Y", tz = "America/Chicago")
-  ) +
-  labs(
-    x = NULL,
-    y = "Rides per month",
-    colour = "Segment"
-  ) +
-  theme_minimal()
-```
-
-```{r}
-#| warning: false
-#| label: fig-dist-median-daily-ride-time
-#| fig-cap: "Distribution of median daily ride times"
-#| fig-asp: 1.25
-#| dev: "svg"
 
 m <- day_rides %>%
   group_by(
@@ -948,6 +902,14 @@ m <- day_rides %>%
   summarise(
     mean_duration = mean(duration_mins)
   )
+```
+
+```{r}
+#| warning: false
+#| label: fig-dist-median-daily-ride-time
+#| fig-cap: "Distribution of median daily ride times"
+#| fig-asp: 1.25
+#| dev: "svg"
 
 day_rides %>%
   ggplot(
@@ -982,10 +944,110 @@ day_rides %>%
     colour = "Day Type"
   )
 ```
+
+The distribution of ride durations in  @fig-dist-median-daily-ride-time shows a clear bimodal distribution for member ride duration taken on weekdays. This reflects shorter median duration for rides taken between November and April illustrated by @fig-duration-bike-user, compared with the May to October period.
+
+A weaker bimodal distribution is evident in weekend member rides and casual rides.
+
+Both member and casual groups electric bikes have a shorter ride duration than classic bikes.
+
+Cyclistic pricing changed on 10 May 2022.
+The changes reduced the casual unlock fee from \$3.30 to \$1.00 and removed 30 minutes included time for classic bikes and e-bike trips.
+There is an indication that the median duration for *Casual-Classic* and *Casual-Electric* trips has declined from May 2022 onwards.
+
+#### Seasonal influence
+
+Member and Casual riding patterns appear to be sensitive to seasonal influences.
 ```{r}
-#| label: fig-avg-median-temp-rides
+#| warning: false
+#| label: fig-rides-bike-user
+#| fig-cap: "Rides per month by market segment"
+#| fig-asp: .5625
+#| dev: "svg"
+
+basic %>%
+  ggplot(aes(
+    month, rides,
+    group = user_bike,
+    colour = user_bike
+  )) +
+  geom_line() +
+  scale_y_continuous(
+    breaks = scales::breaks_width(50000),
+    labels = scales::label_comma()
+  ) +
+  scale_x_date(
+    breaks = scales::breaks_width("2 months"),
+    labels = scales::label_date("%b %Y", tz = "America/Chicago")
+  ) +
+  labs(
+    x = NULL,
+    y = "Rides per month",
+    colour = "Segment"
+  ) +
+  theme_minimal()
+```
+The number of rides taken by all cohorts is lowest in January and February, which coincides with the winter season. Peak ride months cover May, June, July, and September with a slight decline during August.
+
+```{r}
+#| warning: false
+#| label: fig-rides-by-day-week
+#| fig-cap: "Seasonal influence on average daily rides"
 #| fig-asp: 1.25
 #| dev: "svg"
+
+br_season <- bike_rides %>%
+  mutate(
+    season = as.factor(case_when(
+      month(started_at) %in% c(9, 10, 11) ~ "Autumn",
+      month(started_at) %in% c(12, 1, 2) ~ "Winter",
+      month(started_at) %in% c(3, 4, 5) ~ "Spring",
+      month(started_at) %in% c(6, 7, 8) ~ "Summer"
+    )),
+    season = fct_relevel(season, c("Autumn", "Winter", "Spring", "Summer"))
+  ) %>%
+  filter(
+    user_bike != "Casual-Docked"
+  )
+
+br_season %>%
+  group_by(
+    user_bike,
+    season,
+    dayw,
+  ) %>%
+  summarise(
+    avg_rides = n() / n_distinct(date(started_at)),
+    .groups = "drop"
+  ) %>%
+  ggplot(
+    aes(
+      dayw,
+      avg_rides,
+      group = user_bike,
+      colour = user_bike
+    )
+  ) +
+  geom_line() +
+  labs(
+    x = "Day of the week",
+    y = "Average daily rides",
+    colour = "Segment"
+  ) +
+  facet_grid(rows = vars(season)) +
+  theme_minimal()
+```
+One of the notable features of winter is the consistent number of daily rides taken by members despite the cold.
+Members take consistently more weekday rides in all seasons.
+Peak days for rides on causal plans are weekends - Saturday and Sunday - with a larger of rides taken on Fridays during the summer months.
+
+```{r}
+#| warning: false
+#| label: fig-avg-median-temp-rides
+#| fig-cap: "Influence of maximum temperature on ride"
+#| fig-asp: 1.25
+#| dev: "svg"
+
 weather <- read_csv(
   "data/raw/chicago_climate_data_noaa.csv",
   show_col_types = FALSE,
@@ -1017,27 +1079,24 @@ rides_temp %>%
   ) +
   theme_minimal() +
   labs(
-    x = "Maximum Temperature <U+00B0>C",
+    x = "Maximum Temperature (Degrees C)",
     y = "Rides"
   )
 ```
 
-```{r}
-#| label: fig-avg-wind-daily-rides
-#| fig-asp: 1.25
-#| dev: "svg"
+The influence of maximum daily temperatures on number of rides across weekdays and weekends shown in @fig-avg-median-temp-rides.
 
-rides_temp %>%
-  ggplot(aes(awnd, n, group = user_bike)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(color = "red", alpha = 0.5, method = "lm", se = FALSE) +
-  facet_grid(
-    rows = vars(user_bike),
-    cols = vars(weekend)
-  ) +
-  theme_minimal() +
-  labs(
-    x = "Average Windspeed",
-    y = "Rides"
-  )
-```
+Casual classic bike ride numbers remain low when the maximum temperature is 10°C or below. Casual e-bike rides start increasing when the maximum temperature reaches 0°C. TCasual ride numbers appear to decline once the maximum temperature reaches 30 degrees.
+
+Member rides remain at a consistent level right though winter.
+There are similar numbers of electric and classic rides taken during this period. Members show a preference for E-bikes when the temperatures are below 15°C.
+
+Peak ride numbers occur on days when the maximum temperature is between 25 and 35°C. E-bike ride numbers peak at higher maximum temperatures than classic bikes.
+
+This suggests that E-bikes encourage users to ride when maximum temperatures are in the range of -10°C to +15°C, or above 30°C.
+
+
+
+
+
+
