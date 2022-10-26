@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2022-10-22">
+<meta name="dcterms.date" content="2022-10-26">
 
 <title>Paul Jacobson - Cyclistic Customer Analysis</title>
 <style>
@@ -199,7 +199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 22, 2022</p>
+      <p class="date">October 26, 2022</p>
     </div>
   </div>
     
@@ -284,8 +284,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1" data-caption="Building file list"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>divvy_files <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(<span class="st">"September 2021"</span>),</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(<span class="st">"August 2022"</span>),</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(params<span class="sc">$</span>start_date),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">my</span>(params<span class="sc">$</span>end_date),</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"months"</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enframe</span>(</span>
@@ -303,13 +303,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2" data-caption="download zip archives"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"data/raw/{divvy_files}"</span>)</span>
+<div class="sourceCode cell-code" id="cb2" data-caption="download zip archives"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>file_list <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{params$zip_dir}/{divvy_files}"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>files_to_dl <span class="ot">&lt;-</span> divvy_files[<span class="sc">!</span><span class="fu">file.exists</span>(file_list)]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(files_to_dl) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">walk2</span>(</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"https://divvy-tripdata.s3.amazonaws.com/{files_to_dl}"</span>),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"data/raw/{files_to_dl}"</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glue</span>(<span class="st">"{params$zip_dir}/{files_to_dl}"</span>),</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    download.file</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
@@ -947,10 +947,10 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <table class="table table-sm table-striped">
 <caption>Table&nbsp;8: Stations recorded as in-service</caption>
 <colgroup>
-<col style="width: 25%">
-<col style="width: 49%">
-<col style="width: 11%">
+<col style="width: 27%">
+<col style="width: 47%">
 <col style="width: 12%">
+<col style="width: 13%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -963,39 +963,39 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Vincennes Ave &amp; 75th St</td>
-<td style="text-align: right;">41.75797</td>
-<td style="text-align: right;">-87.63121</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-07-07 14:15:27</td>
-<td style="text-align: left;">Public Rack - Austin Blvd &amp; North Ave</td>
-<td style="text-align: right;">41.90928</td>
-<td style="text-align: right;">-87.77561</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-05-17 20:35:40</td>
-<td style="text-align: left;">Kedvale Ave &amp; Addison St</td>
-<td style="text-align: right;">41.94717</td>
-<td style="text-align: right;">-87.73084</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Oleander Ave &amp; Addison St</td>
-<td style="text-align: right;">41.94498</td>
-<td style="text-align: right;">-87.81587</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-05-09 15:14:55</td>
-<td style="text-align: left;">Ewing Ave &amp; 99th St</td>
-<td style="text-align: right;">41.71596</td>
-<td style="text-align: right;">-87.53511</td>
+<td style="text-align: left;">Calumet Ave &amp; 51st St</td>
+<td style="text-align: right;">41.80230</td>
+<td style="text-align: right;">-87.61805</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2021-08-31 05:05:35</td>
-<td style="text-align: left;">Bennett Ave &amp; 79th St</td>
-<td style="text-align: right;">41.75178</td>
-<td style="text-align: right;">-87.57850</td>
+<td style="text-align: left;">California Ave &amp; Francis Pl (Temp)</td>
+<td style="text-align: right;">41.91849</td>
+<td style="text-align: right;">-87.69742</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2022-05-09 15:14:55</td>
+<td style="text-align: left;">Ashland Ave &amp; 45th St</td>
+<td style="text-align: right;">41.81196</td>
+<td style="text-align: right;">-87.66486</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Rockwell St &amp; Eastwood Ave</td>
+<td style="text-align: right;">41.96590</td>
+<td style="text-align: right;">-87.69364</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Marshfield Ave &amp; 59th St</td>
+<td style="text-align: right;">41.78683</td>
+<td style="text-align: right;">-87.66621</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-31 05:05:35</td>
+<td style="text-align: left;">Dorchester Ave &amp; 49th St</td>
+<td style="text-align: right;">41.80577</td>
+<td style="text-align: right;">-87.59246</td>
 </tr>
 </tbody>
 </table>
@@ -1308,8 +1308,9 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 <p><a href="#tbl-remove-operational">Table&nbsp;10</a> shows a sample of the dataset after initial cleaning.</p>
-<section id="named-stations-with-rounded-coordinates" class="level5">
-<h5 data-anchor-id="named-stations-with-rounded-coordinates">Named stations with rounded coordinates</h5>
+</section>
+<section id="named-stations-with-rounded-coordinates" class="level4">
+<h4 data-anchor-id="named-stations-with-rounded-coordinates">Named stations with rounded coordinates</h4>
 <p>Some named stations were found to have rounded location coordinates. Additionally there is some inaccuracy of reported location coordinates.</p>
 <p>To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.</p>
 <p>Joining the <code>active_station</code> data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.</p>
@@ -1423,7 +1424,6 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-</section>
 </section>
 <section id="ride-duration" class="level4">
 <h4 data-anchor-id="ride-duration">Ride duration</h4>
@@ -2223,10 +2223,63 @@ $ user_bike          &lt;fct&gt; Casual-Electric, Casual-Electric, Casual-Electr
 </div>
 </div>
 </div>
-<p>Member and casual rides show distinct differences between weekday ride times. Member ride starts show two well defined peaks aligning with morning and afternoon commutes. The morning rides peak from 8.00am to 9.00am while afternoon rides peak at roughly 5:30pm.</p>
-<p>Casual rides show a far less defined morning peak. Rides steadily increase across the day peaking at around 5:30pm. This may indicate casual workers in hospitality and retail who start work later in the day have different commute patterns.</p>
-<p>All cohorts display a small peak around midday.</p>
+<p>Member and casual rides show distinct differences between weekday ride times.</p>
+<p>Member ride starts show two well defined peaks aligning with morning and afternoon commutes. Casual rides steadily increase across the day peaking at around 5:30pm. All cohorts display a small peak around midday.</p>
 <p>Weekend riding patterns show a steady increase with ride starts levelling off around 10.00am then remaining fairly constant until late afternoon. Ride starts then taper off into the evening with a small peak around 8.30pm.</p>
+</section>
+<section id="location" class="level4">
+<h4 data-anchor-id="location">Location</h4>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>station_season_time <span class="ot">&lt;-</span> br_season <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">weekend =</span> <span class="fu">if_else</span>(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>      dayw <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Sat"</span>, <span class="st">"Sun"</span>),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Weekend"</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Weekday"</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(end_station_name),</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    hour <span class="sc">==</span> <span class="dv">10</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    longitude_end,</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    latitude_end,</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    weekend,</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    user_bike</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">nm =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(weekend, user_bike) <span class="sc">%&gt;%</span></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(nm, <span class="at">n =</span> <span class="dv">50</span>)</span></code></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'longitude_end', 'latitude_end', 'weekend'.
+You can override using the `.groups` argument.</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggmap</span>(chi_map) <span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> station_season_time,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>      longitude_end,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>      latitude_end,</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">colour =</span> user_bike</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.4</span>,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> .<span class="dv">75</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vars</span>(weekend),</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">vars</span>(user_bike)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="cyclistic_files/figure-html/unnamed-chunk-40-1.svg" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
 </section>
