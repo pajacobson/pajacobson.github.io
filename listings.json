@@ -2,7 +2,8 @@
   {
     "listing": "/projects.html",
     "items": [
-      "/projects/cyclistic/cyclistic.html"
+      "/projects/cyclistic/cyclistic.html",
+      "/projects/cyclistic/datacleaning.html"
     ]
   }
 ]
