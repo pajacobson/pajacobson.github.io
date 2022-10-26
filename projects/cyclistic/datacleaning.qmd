@@ -1,0 +1,773 @@
+---
+title: "Cyclistic Data Cleaning"
+subtitle: "Google Data Analytics Certificate Capstone"
+date: today
+image: images/mariusz-pierog-EqPRDrddtaQ-unsplash-thumb.jpg
+format:
+  html:
+    highlight-style: breezedark
+    df-print: kable
+    code-fold: true
+    fig-responsive: true
+abstract-title: "Summary"
+abstract: "Collecting and cleaning Divvy Bikes ride data."
+params:
+  start_date: "September 2021"
+  end_date: "August 2022"
+  zip_dir: "data/raw"
+editor:
+  markdown:
+    wrap: sentence
+---
+
+::: column-body
+
+![Image: [Mariusz Pierog](https://unsplash.com/@mariuszpierog?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)](images/mariusz-pierog-EqPRDrddtaQ-unsplash-banner.jpg)
+:::
+
+## Data sources
+
+### Divvy Bikes system data and pricing
+
+The base data for individual rides was extracted from Divvy Bike data files covering the period 1 September 2021 to 31 August 2022.
+Additional data description and a download link is provided on the Divvy Bikes [system data](https://ride.divvybikes.com/system-data) page.
+
+The [license](https://ride.divvybikes.com/data-license-agreement) allows inclusion of data within analyses and studies published for non-commercial.
+This clause covers the intended use.
+
+Details of current [pricing](https://ride.divvybikes.com/pricing) for Divvy Bikes offerings was accessed on 25 September 2022.
+
+### NOAA Climate Data
+
+Weather data covering September 2021 to August 2022 ordered from [NOOA National Centers for Environmental Information](https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094846/detail)
+
+O'Hare International Airport weather station was selected as representative of the Chicago region.
+
+### Divvy Bikes historical station status
+
+Historical station status identifies which stations actively used between `r params$start_date` and `r params$end_date`.
+This information is used to assist identifying Divvy operational rides in the data set.
+
+[City of Chicago open data listing of Divvy Stations](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq)
+
+## Data cleaning and preparation
+
+### Initial import
+
+```{r libraries}
+#| label: lst-load-libraries
+#| warning: false
+#| echo: false
+library(tidyverse)
+library(lubridate)
+library(glue)
+library(archive)
+library(ggmap)
+```
+
+The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
+This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
+
+
+```{r}
+#| label: lst-file-list
+#| lst-cap: "Building file list"
+
+divvy_files <- seq(
+  my(params$start_date),
+  my(params$end_date),
+  by = "months"
+) %>%
+  enframe(
+    value = "timestamp"
+  ) %>%
+  glue_data(
+    "{year(timestamp)}",
+    "{stringi::stri_sprintf('%02d', month(timestamp))}",
+    "-divvy-tripdata.zip"
+  )
+```
+
+To preserve a local copy of the original data, zip files are downloaded to the `data/raw` folder.
+The folder is checked each time the script is run, and files which are already present are removed from the download list.
+
+Any files which are not present in the `data/raw`folder are downloaded.
+
+```{r}
+#| label: lst-download-archives
+#| lst-cap: "download zip archives"
+file_list <- glue("{params$zip_dir}/{divvy_files}")
+files_to_dl <- divvy_files[!file.exists(file_list)]
+
+if (length(files_to_dl) > 0) {
+  purrr::walk2(
+    glue("https://divvy-tripdata.s3.amazonaws.com/{files_to_dl}"),
+    glue("{params$zip_dir}/{files_to_dl}"),
+    download.file
+  )
+}
+```
+
+The first 1000 rows are read from `r params$start_date` zip file.
+This allows `read_csv` to determine the type of data in each column.
+The "guessed" column type specification can then inspected using the `spec` function.
+
+```{r}
+#| label: lst-guess-cols
+bike_inspect <- map_dfr(
+  file_list[1],
+  ~ archive_read(.) %>%
+    read_csv(
+      n_max = 1000,
+      show_col_types = FALSE
+    )
+)
+spec(bike_inspect)
+```
+
+The types defined in the column specification appear to be reasonable choices based on naming of the columns.
+
+To verify column naming is consistent across all files, the header row from each file is read.
+The resulting data frame is processed using `distinct()` to eliminate duplicated rows.
+If all headers are identical the resulting data frame will have a single row.
+
+```{r}
+#| label: lst-check-headers
+bike_headers <- map_dfr(
+  file_list,
+  ~ archive_read(.) %>%
+    read_csv(
+      n_max = 1,
+      col_names = FALSE,
+      show_col_types = FALSE
+    )
+) %>%
+  distinct()
+
+glimpse(bike_headers)
+```
+
+After verifying the detected formats, and checking column naming is consistent across all files, the full dataset can be imported.
+Passing the full column specification to `read_csv()` ensure that data which does not match the expected type is flagged as a problem.
+Issues that arise while importing data can be examined using the `problems()` function.
+
+```{r}
+#| label: lst-import-from-zip
+#| cache: true
+bike_rides <- map_dfr(
+  file_list,
+  ~ archive_read(.) %>%
+    read_csv(
+      col_types = cols(
+        ride_id = col_character(),
+        rideable_type = col_factor(levels = c(
+          "classic_bike",
+          "docked_bike",
+          "electric_bike"
+        )),
+        started_at = col_datetime(),
+        ended_at = col_datetime(),
+        start_station_name = col_character(),
+        start_station_id = col_character(),
+        end_station_name = col_character(),
+        end_station_id = col_character(),
+        start_lat = col_double(),
+        start_lng = col_double(),
+        end_lat = col_double(),
+        end_lng = col_double(),
+        member_casual = col_factor(levels = c(
+          "member",
+          "casual"
+        ))
+      ),
+      locale = locale(tz = "America/Chicago")
+    )
+)
+```
+
+To improve readability `rideable_type` is renamed to `bike_type` and the `_bike` suffix removed from the factor levels.
+`member_casual` is renamed to `user_type` and the factor levels given inital caps.
+An additional column is added which combines the `bike_type` and `user_type` categorical variables.
+
+```{r}
+#| label: lst-recode-factors
+bike_rides <- bike_rides %>%
+  mutate(
+    rideable_type = recode(
+      rideable_type,
+      classic_bike = "Classic",
+      docked_bike = "Docked",
+      electric_bike = "Electric"
+    ),
+    member_casual = recode(
+      member_casual,
+      member = "Member",
+      casual = "Casual"
+    ),
+    user_bike = forcats::fct_cross(member_casual, rideable_type, sep = "-")
+  ) %>%
+  rename(
+    bike_type = rideable_type,
+    user_type = member_casual
+  )
+```
+
+### Data inspection
+
+With the data loaded from file, the data structure can checked with `glimpse()`.
+
+```{r}
+#| label: tbk-check-data-structure
+#| tbl-cap: "Structure of imported data"
+#| markup: true
+glimpse(bike_rides)
+```
+
+The output indicates that the data set has `r format(nrow(bike_rides), big.mark = ",")` rows, and `r ncol(bike_rides)` columns.
+The `start_station_name`, `start_stattion_id`, `end_station_name` and `end_station_id` columns appear to have a number of missing values - identified by `NA`.
+
+```{r}
+#| label: tbl-missing-values
+#| tbl-cap: "Missing Values"
+
+bike_rides %>%
+  summarise(across(
+    everything(),
+    ~ sum(is.na(.x))
+  )) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "Column",
+    values_to = "Missing Count"
+  )
+```
+
+@tbl-missing-values indicates a significant number of observations are missing end and start station name and id.
+End station location information is also missing small number of records.
+All other columns have complete data.
+
+```{r}
+#| label: tbl-missing-by-station
+#| tbl-cap: "Missing Values by station type"
+bike_rides %>%
+  mutate(
+    missing_start = is.na(start_station_name),
+    missing_end = is.na(end_station_name)
+  ) %>%
+  summarise(
+    "Start Only" = sum(missing_start & !missing_end),
+    "End Only" = sum(missing_end & !missing_start),
+    Both = sum(missing_start & missing_end),
+    "Rides effected" = sum(missing_start | missing_end)
+  )
+```
+
+@tbl-missing-by-station indicates that `r sprintf("%.2f", 1322897 * 100 / nrow(bike_rides))`% of all rides are missing data for at least one docking station.
+This should be checked to determine whether this is due to error or a systematic reason.
+
+```{r}
+#| label: tbl-coord-range
+#| tbl-cap: "Latitude and Longitude ranges"
+bike_rides %>%
+  summarise(
+    start_lat = range(start_lat, na.rm = TRUE),
+    start_lng = range(start_lng, na.rm = TRUE),
+    end_lat = range(end_lat, na.rm = TRUE),
+    end_lng = range(end_lng, na.rm = TRUE)
+  )
+```
+
+The maximum start longitude and latitude values listed in @tbl-coord-range are significantly different to the remaining values.
+This suggests some rides may have originated outside the Chicago metropolitan area serviced by Cyclistic.
+
+It appears that some latitude and longitude values may have been rounded to two significant digits.
+Comparing the value to itself rounded to 2 decimal places identifies potentially truncated values.
+Clamping the coordinates in this way means actual locations can be anywhere within 1 square kilometre area centred on the given grid location.
+
+```{r}
+#| label: tbl-clipped-start
+#| tbl-cap: "Clipped coordinates and missing start station name"
+bike_rides %>%
+  group_by(Missing = is.na(start_station_id)) %>%
+  summarise(
+    Latitude = sum(start_lat == round(start_lat, 2), na.rm = TRUE),
+    Longitude = sum(start_lng == round(start_lng, 2), na.rm = TRUE)
+  )
+```
+
+Comparing @tbl-missing-values with @tbl-clipped-start indicates the number of start stations with missing names is the same as those which have rounded coordinates.
+
+```{r}
+#| label: tbl-clipped-end
+#| tbl-cap: "Clipped coordinates and missing end station name"
+bike_rides %>%
+  group_by(Missing = is.na(end_station_id)) %>%
+  summarise(
+    Latitude = sum(end_lat == round(end_lat, 2), na.rm = TRUE),
+    Longitude = sum(end_lng == round(end_lng, 2), na.rm = TRUE)
+  )
+```
+
+Comparing @tbl-missing-values with @tbl-clipped-end indicates the combined count of end stations with missing latitude and longitude and those with rounded coordinates matches the count of missing end station names.
+
+This suggests that there is a systemic reason for the missing data, rather than error.
+It seems likely the location data has been anonymised to protect riders privacy.
+This needs to be verified with Cyclistics data collection team.
+
+The ride duration and other information appear plausible and the lack of location data does not impact analysis of this data.
+Records with missing location information will be retained but filtered for any analysis which depends on accurate location.
+
+While the majority of rounded coordinates occur where station names are missing approximately 8% are for stations which are named.
+These need to be checked during cleaning.
+
+```{r}
+#| label: tbl-date-ranges
+#| tbl-cap: "Ride start and end date ranges"
+
+bike_rides %>%
+  summarise(
+    start_range = range(started_at),
+    end_range = range(ended_at)
+  )
+```
+
+@tbl-date-ranges indicates the dataset includes rides which finished after `r params$end_date`.
+
+```{r}
+#| echo: false
+eop_rides_00 <- bike_rides %>%
+  filter(ended_at > ymd_hms("20220901 00:00:00", tz = "America/Chicago")) %>%
+  summarise(ride_id)
+```
+
+In total `r nrow(eop_rides_00)` rides are active at midnight on 31 August 2022.
+As these overnight rides cause issues with data visualisation and other analysis, I chose to remove rides which finished after mid
+
+### Data Cleaning
+
+#### Missing end station coordinates
+
+The end stations with missing name and coordinates are addressed first.
+
+```{r}
+#| label: tbl-no-end-coords
+#| tbl-cap: "Missing end station coordinates"
+
+no_end_coords <- bike_rides %>%
+  filter(is.na(end_lat), is.na(end_lng))
+
+no_end_coords %>%
+  select(
+    -ride_id,
+    -starts_with("start_")
+  ) %>%
+  head()
+```
+
+The preview of these rides contains several rides which extend for more than a day.
+Cyclistic treat bikes unlocked for more than 24 hours as stolen.
+These rides are likely to be bikes that have been reported stolen and not physically docked at the ride termination time.
+
+```{r}
+#| label: fig-rides-missing-end-coord
+#| fig-cap: "Summary of rides with missing end coordinates"
+#| warning: false
+#| dev: "svg"
+
+n_e_c <- no_end_coords %>%
+  group_by(user_type) %>%
+  summarise(triptime = as.numeric(started_at %--% ended_at, units = "days"), n = n())
+
+
+n_e_c %>%
+  ggplot(aes(triptime, fill = user_type)) +
+  geom_histogram(binwidth = 1) +
+  scale_y_log10() +
+  guides(fill = "none") +
+  facet_grid(rows = vars(user_type)) +
+  labs(
+    title = "Rides with missing end coordinates by user type",
+    x = "Trip Duration in Days",
+    y = "Rides (log10)"
+  ) +
+  theme_minimal()
+```
+
+@fig-rides-missing-end-coord shows that the majority of ride with missing end coordinates had a duration of more than 24 hours.
+Notably casual rides are the biggest contributor.
+
+#### Cyclistic operational rides
+
+A list of stations that were *In-Service* between `r params$start_date` and `r params$end_date` was extracted from a dataset maintained by City of Chicago.
+The dataset for the period of interest contains over 35 million rows recording the status of each docking station at hour intervals.
+
+Due to the size of the dataset the processed listing of stations is used in this analysis.
+
+```{r}
+#| label: tbl-stations-in-use
+#| tbl-cap: "Stations recorded as in-service"
+#| warning: false
+active_stations <- read_csv(
+  "data/processed/stations_in_use.csv",
+  show_col_types = FALSE
+)
+
+active_stations %>%
+  slice_sample(n = 6) %>%
+  select(-id)
+```
+
+A random sample of stations from the dataset is shown in @tbl-stations-in-use.
+The timestamp indicates the first time a station appears as *In-Service* in the original dataset.
+
+The active stations dataset is used to identify stations that were not listed as publicly available.
+
+```{r}
+#| label: tbl-unlisted-stations
+#| tbl-cap: "Unlisted stations"
+#| warning: false
+unlisted_start <- bike_rides %>%
+  anti_join(
+    active_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  select(
+    station_name = start_station_name,
+    station_id = start_station_id
+  )
+
+unlisted_end <- bike_rides %>%
+  anti_join(
+    active_stations,
+    by = c("end_station_name" = "station_name")
+  ) %>%
+  select(
+    station_name = end_station_name,
+    station_id = end_station_id
+  )
+
+unlisted_stations <- unlisted_start %>%
+  bind_rows(unlisted_end) %>%
+  drop_na(station_name, station_id) %>%
+  group_by(station_name, station_id) %>%
+  summarise(count = n())
+
+unlisted_stations
+```
+
+@tbl-unlisted-stations summarises stations which appear in `bike_rides` without a corresponding match in the `active_stations` dataset.
+
+The majority of stations in the table appear to have an operational function.
+Those ending with "- Charging" appear to be associated with testing of new charging stations prior to the company publicly announcing their availability.
+
+#### Removing operational and no-return rides
+
+Before proceeding with further manipulation and cleaning, the observations with identified problems should be removed.
+This is done using `dplyr::anti_join()` to filter the `bike_rides` dataset removing items matching those found in the `unlisted_stations` and `no_end_coords` data.frames.
+
+```{r}
+#| label: tbl-remove-operational
+#| tbl-cap: "Sample of cleaned data"
+#| cache: true
+bike_rides <- bike_rides %>%
+  anti_join(
+    unlisted_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  anti_join(
+    unlisted_stations,
+    by = c("end_station_name" = "station_name")
+  ) %>%
+  anti_join(
+    no_end_coords,
+    by = "ride_id"
+  ) %>%
+  anti_join(
+    eop_rides_00,
+    by = "ride_id"
+  )
+
+bike_rides %>%
+  slice_sample(n = 6)
+```
+
+@tbl-remove-operational shows a sample of the dataset after initial cleaning.
+
+#### Named stations with rounded coordinates
+
+Some named stations were found to have rounded location coordinates.
+Additionally there is some inaccuracy of reported location coordinates.
+
+To rectify this, the location and id information for each active station was joined to the rides dataset based on station name.
+
+Joining the `active_station` data also replaces inaccurate bike GPS location data which clusters around stations with a single official location per docking station.
+
+```{r}
+#| label: lst-cleaning-truncated-coords
+#| lst-cap: "Clean named station coordinates"
+bike_rides <- bike_rides %>%
+  left_join(
+    active_stations,
+    by = c("start_station_name" = "station_name")
+  ) %>%
+  select(-timestamp) %>%
+  left_join(
+    active_stations,
+    by = c("end_station_name" = "station_name"),
+    suffix = c("_start", "_end")
+  ) %>%
+  select(-timestamp) %>%
+  distinct(ride_id, .keep_all = TRUE) %>%
+  mutate(
+    latitude_end = if_else(
+      is.na(latitude_end),
+      end_lat,
+      latitude_end
+    ),
+    longitude_end = if_else(
+      is.na(longitude_end),
+      end_lng,
+      longitude_end
+    ),
+    latitude_start = if_else(
+      is.na(latitude_start),
+      start_lat,
+      latitude_start
+    ),
+    longitude_start = if_else(
+      is.na(longitude_start),
+      start_lng,
+      longitude_start
+    )
+  ) %>%
+  select(-ends_with("_lng"), -ends_with("_lat"))
+```
+
+```{r}
+#| label: lst-stations-per-coord
+#| lst-cap: "Exctract bounding coordinates"
+#| warning: false
+ss <- bike_rides %>%
+  mutate(
+    missing = if_else(
+      !is.na(start_station_name),
+      "Named",
+      "Unnamed"
+    ),
+    ride_day = date(started_at)
+  ) %>%
+  select(ride_day, missing, latitude_start, longitude_start) %>%
+  group_by(missing, latitude_start, longitude_start) %>%
+  summarise(
+    rides = n(),
+    avg_rides = rides / n_distinct(ride_day),
+    .groups = "drop"
+  )
+
+
+bounding_box <- ss %>%
+  summarise(
+    left = min(longitude_start) - 0.01,
+    bottom = min(latitude_start) - 0.01,
+    right = max(longitude_start) + 0.01,
+    top = max(latitude_start) + 0.01
+  ) %>%
+  unlist()
+
+chi_map <- get_stamenmap(
+  bounding_box,
+  maptype = "toner-lite"
+)
+```
+
+```{r, fig.height = 8}
+#| label: fig-location-compare
+#| fig-cap: "Comparison of location data for named and unnamed stations"
+#| warning: false
+#| dev: "svg"
+
+ggmap(chi_map) +
+  geom_point(
+    data = ss,
+    aes(
+      longitude_start,
+      latitude_start,
+      colour = missing
+    ),
+    size = 1,
+    alpha = 0.75
+  ) +
+  facet_grid(cols = vars(missing)) +
+  guides(colour = "none") +
+  scale_colour_manual(values = c("#52854C", "#D16103")) +
+  labs(
+    title = "Named and Unnamed Station locations",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal()
+```
+
+#### Ride duration
+
+##### Adding Ride Duration, Time and Day of Week
+
+To aid analysis of temporal variation in cohort behaviour, calculated columns for the ride duration, and the hour, day, and month each ride started are added to the dataset.
+
+```{r}
+#| label: tbl-add-duration
+#| tbl-cap: "Sample of rides with added duration, month, date and hour"
+#| cache: true
+bike_rides <- bike_rides %>%
+  mutate(
+    ride_int = started_at %--% ended_at,
+    ride_time = as.duration(ride_int),
+    month = floor_date(as.Date(started_at, tz = "America/Chicago"), "month"),
+    hour = hour(started_at),
+    dayw = wday(started_at, label = TRUE),
+    daym = day(started_at),
+    .before = start_station_name
+  )
+
+bike_rides %>%
+  select(-ride_id, -ride_int) %>%
+  slice_sample(n = 6)
+```
+
+@tbl-add-duration shows a sample of the resulting dataset with added columns.
+Minimum and maximum ride times can now be checked for plausibility.
+
+```{r}
+#| label: tbl-ride-min-max
+#| tbl-cap: "Summary of ride duration (hours)"
+#| cache: true
+bike_rides %>%
+  summarise(
+    Minimum = min(ride_time) / 3600,
+    Maximum = max(ride_time) / 3600
+  )
+```
+
+Both minimum and maximum ride durations indicate the data set contains values which need to be checked, and possibly removed. Ride times of less than zero should not occur and ride times of 28 days are very unlikely given the accrued charges would be around $6500 at casual trip rates.
+
+##### Addressing negative ride durations
+
+```{r}
+#| label: fig-negative-ride-duration
+#| fig-cap: "Distribution of negative ride times by month"
+#| dev: "svg"
+
+bike_rides %>%
+  group_by(month) %>%
+  summarise(
+    nrt = mean(ride_time < 0) * 100
+  ) %>%
+  ggplot(aes(month, nrt)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "Rides with negative duration",
+    x = "Month",
+    y = "Percentage of Rides"
+  )
+```
+
+```{r}
+#| label: tbl-days-neg-rides
+#| tbl-cap: "Days with negative ride time"
+#| warning: false
+
+bike_rides %>%
+  group_by(
+    Month = month,
+    Day = daym
+  ) %>%
+  summarise(
+    "Percent Negative" = mean(ride_time < 0) * 100,
+    .groups = "drop"
+  ) %>%
+  filter(`Percent Negative` > 0) %>%
+  slice_max(`Percent Negative`, n = 6)
+```
+
+@fig-negative-ride-duration and @tbl-days-neg-rides show that the percentage rides with negative durations is around three times higher on 7th November than the next highest day - 29th September.
+
+```{r}
+#| label: tbl-hour-neg-rides
+#| tbl-cap: "Negative ride duration by hour"
+
+bike_rides %>%
+  filter(
+    month(started_at) == 11,
+    day(started_at) == 7
+  ) %>%
+  group_by(Hour = hour(started_at)) %>%
+  summarise(
+    "Percent Negative" = mean(ride_time < 0) * 100,
+    Count = sum(ride_time < 0)
+  ) %>%
+  filter(`Percent Negative` > 0)
+```
+
+@tbl-hour-neg-rides shows that all negative ride durations on 7th November were taken between 1.00am and 2.00am.
+This coincides with the end of daylight savings in Chicago.
+At 2.00am clocks went back one hour to 1.00am.
+
+Ride start and end timestamp values in the dataset do not include timezone information.
+Timestamps between 1.00am and 2.00am could refer to either Central Daylight Time or Central Standard Time meaning there is an ambiguity which is very difficult to resolve.
+
+The negative duration of rides which start and end between 1.00am and 2.00am can be resolved by adding 60 minutes.
+However the ambiguity of the rides which have one end point in this time range remains.
+
+I recommend that timezone be recorded as part of the timestamp in future to avoid these issues.
+
+For the present analysis I've chosen to correct the negative timestamps between 1.00am and 2.00am and to leave the ambiguous timestamps unaltered.
+
+```{r}
+#| label: lst-remove-dst-negatives
+#| lst-cap: "Correct dst change ride durations"
+bike_rides <- bike_rides %>%
+  mutate(ride_time = if_else(
+    (ride_time < 0) & (date(started_at) == date("2021-11-07")),
+    ride_time + 3600,
+    ride_time
+  ))
+```
+
+##### Other ride duration issues
+
+The [Cyclistic website](https://ride.divvybikes.com/system-data) indicates that rides of less than 60 seconds have been removed from the dataset.
+Cyclistic help pages note that if rides [exceed 24 hours](https://help.divvybikes.com/hc/en-us/articles/360033123412-My-bike-was-lost-or-stolen) the bike is treated as stolen and the user can be fined \$1200.
+
+These types of rides should not be present.
+
+```{r}
+#| label: tbl-short-long
+#| tbl-cap: "Trips less than 60 seconds and more than 24 hours"
+bike_rides %>%
+  summarise(
+    "< 60 seconds" = sum(ride_time < 60),
+    "> 24 hours" = sum(ride_time > 86000)
+  )
+```
+
+The significant number of short trips indicate these have not been removed from the data prior to upload.
+These short rides and rides which can be classified as stolen are removed.
+
+```{r}
+#| label: lst-filter-short-long
+#| lst-cap: "Filter short and long "
+bike_rides <- bike_rides %>%
+  filter(
+    ride_time > 60,
+    ride_time < 86000
+  )
+```
+
+With cleaning completed the processed dataset is saved as a `RDS` file.
+
+```{r}
+#| label: lst-data-save
+#| eval: false
+write_rds(bike_rides, "data/processed/bike_rides.rds", compress = "gz")
+```
