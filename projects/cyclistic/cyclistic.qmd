@@ -20,6 +20,7 @@ editor:
     wrap: sentence
 ---
 
+
 ::: column-body
 ![](images/josh-mccausland-8TfeD3J4VtQ-thumb.png)
 :::
@@ -118,13 +119,14 @@ library(ggmap)
 The Divvy trip data files have a consistent naming format `YYYYMM-divvy-tripdata.zip`.
 This allows file names to be generated for months in the range `r params$start_date` to `r params$end_date`.
 
+
 ```{r}
 #| label: lst-file-list
 #| lst-cap: "Building file list"
 
 divvy_files <- seq(
-  my("September 2021"),
-  my("August 2022"),
+  my(params$start_date),
+  my(params$end_date),
   by = "months"
 ) %>%
   enframe(
@@ -145,13 +147,13 @@ Any files which are not present in the `data/raw`folder are downloaded.
 ```{r}
 #| label: lst-download-archives
 #| lst-cap: "download zip archives"
-file_list <- glue("data/raw/{divvy_files}")
+file_list <- glue("{params$zip_dir}/{divvy_files}")
 files_to_dl <- divvy_files[!file.exists(file_list)]
 
 if (length(files_to_dl) > 0) {
   purrr::walk2(
     glue("https://divvy-tripdata.s3.amazonaws.com/{files_to_dl}"),
-    glue("data/raw/{files_to_dl}"),
+    glue("{params$zip_dir}/{files_to_dl}"),
     download.file
   )
 }
@@ -542,7 +544,7 @@ bike_rides %>%
 
 @tbl-remove-operational shows a sample of the dataset after initial cleaning.
 
-##### Named stations with rounded coordinates
+#### Named stations with rounded coordinates
 
 Some named stations were found to have rounded location coordinates.
 Additionally there is some inaccuracy of reported location coordinates.
@@ -1153,14 +1155,51 @@ br_season %>%
 ```
 
 Member and casual rides show distinct differences between weekday ride times.
-Member ride starts show two well defined peaks aligning with morning and afternoon commutes.  The morning rides peak from 8.00am to 9.00am  while afternoon rides peak at roughly 5:30pm.
 
-Casual rides show a far less defined morning peak. Rides steadily increase across the day peaking at around 5:30pm.
-This may indicate workers in hospitality or retail who start work later in the day have displaying different commute patterns.
-
-All cohorts display a small peak around midday.
+Member ride starts show two well defined peaks aligning with morning and afternoon commutes. Casual rides steadily increase across the day peaking at around 5:30pm. All cohorts display a small peak around midday.
 
 Weekend riding patterns show a steady increase with ride starts levelling off around 10.00am then remaining fairly constant until late afternoon. Ride starts then taper off into the evening with a small peak around 8.30pm.
 
+#### Location
+
+```{r}
+station_season_time <- br_season %>%
+  mutate(
+    weekend = if_else(
+      dayw %in% c("Sat", "Sun"),
+      "Weekend",
+      "Weekday"
+    )
+  ) %>%
+  filter(
+    !is.na(end_station_name),
+    hour == 10
+  ) %>%
+  group_by(
+    longitude_end,
+    latitude_end,
+    weekend,
+    user_bike
+  ) %>%
+  summarise(nm = n()) %>%
+  group_by(weekend, user_bike) %>%
+  slice_max(nm, n = 50)
+
+ggmap(chi_map) +
+  geom_point(
+    data = station_season_time,
+    aes(
+      longitude_end,
+      latitude_end,
+      colour = user_bike
+    ),
+    alpha = 0.4,
+    size = .75
+  ) +
+  facet_grid(
+    rows = vars(weekend),
+    cols = vars(user_bike)
+  )
+```
 
 
