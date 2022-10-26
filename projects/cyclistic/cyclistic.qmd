@@ -1163,6 +1163,7 @@ Weekend riding patterns show a steady increase with ride starts levelling off ar
 #### Location
 
 ```{r}
+#| dev: "svg"
 station_season_time <- br_season %>%
   mutate(
     weekend = if_else(
